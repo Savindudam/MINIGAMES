@@ -16,7 +16,7 @@ I built Mini Arcade V1 as a complete, ready-to-play web experience that mixes pu
 
 Right now in V1 you get four polished games:
 - Memory Match – flip cards and test your brain
-- Tic Tac Toe – battle a smart AI (easy or unbeatable mode)
+- Tic Tac Toe – battle a smart Computer (easy or unbeatable mode)
 - Reaction Time Tester – how fast are your reflexes?
 - Web Dev Quiz – 10 questions that actually test real JavaScript & web knowledge
 
@@ -33,8 +33,7 @@ Every game has live scoring, satisfying sounds, smooth animations, and saves you
 - Built-in sound effects (Web Audio API) — toggle on/off with the speaker icon
 - Fully responsive — plays perfectly on phone, tablet, or desktop
 - Zero dependencies — one single HTML file does everything
-- Clean, human-friendly code — I wrote it so it’s easy to understand, modify, or expand later
-
+  
 I focused on making every detail feel good to use: no lag, no annoying pop-ups, just pure joy.
 
 ---
@@ -45,33 +44,19 @@ I focused on making every detail feel good to use: no lag, no annoying pop-ups, 
 |-------------------------|---------------|
 | HTML5 + CSS3            | Clean structure and those sweet 3D card flips |
 | Tailwind CSS            | Fast, beautiful styling without writing 1000 lines of CSS |
-| Vanilla JavaScript      | All the game logic, timers, AI, scoring — pure power, no frameworks |
+| Vanilla JavaScript      | All the game logic, timers,scoring — pure power, no frameworks |
 | Web Audio API           | Fun little beeps and win sounds (no extra files needed) |
-| localStorage            | Your high scores stay forever |
 | CSS Animations          | Smooth transitions and that arcade “pop” feeling |
 
 Core web dev concepts I showed off in V1:
 - Event-driven programming
 - Dynamic DOM updates
 - State management for each game
-- Smart AI logic
 - Timing systems and win detection
 - Modular code (even though it’s one file right now)
 
-This V1 is perfect for portfolios, learning, or just sharing with friends.
-
 ---
 
-## How to Play Right Now
-
-1. Download or copy the index.html file.
-2. Open it in any modern browser (Chrome, Edge, Firefox, Safari — works offline!).
-3. Click any game card on the homepage and start playing instantly.
-
-Want to host it online for free?  
-Just drag the file to GitHub Pages, Netlify, or Vercel — you’ll have a live link in seconds.
-
----
 
 ## How Each Game Works in V1
 
@@ -82,8 +67,8 @@ Just drag the file to GitHub Pages, Netlify, or Vercel — you’ll have a live 
 - Score = 1000 points minus penalties
 
 ### Tic Tac Toe
-- You are X, AI is O
-- Switch between easy (random) and hard (unbeatable) AI
+- You are X, Computer is O
+- Switch between easy (random) and hard (unbeatable) Computer
 - First to three in a row wins
 - Score = 500 for win, 200 for draw
 
@@ -97,16 +82,6 @@ Just drag the file to GitHub Pages, Netlify, or Vercel — you’ll have a live 
 - 10 real questions about JavaScript, DOM, CSS
 - Instant feedback with colors
 - Timer + bonus points for finishing quick
-
----
-
-## High Scores – Your Personal Hall of Fame
-
-After every game you’ll see your current score.  
-Hit the big “SAVE HIGH SCORE” button and it gets added to your personal leaderboard.  
-Tap the High Scores icon in the top navbar anytime to see all your best scores across every game.
-
-Your scores stay saved in your browser — come back anytime and try to beat yourself!
 
 ---
 
