@@ -1,18 +1,11 @@
 # MINI ARCADE V1
 
-Mini Arcade V1 - this is my first attempt at building a browser-based arcade with multiple classic games. I’m DreamXHAVA, and I put this together because I wanted to create something fun that anyone could play right in their browser.
-
-This is just the first version - I’m planning to add more games and features over time!
+Mini Arcade V1 - this is my first attempt at building a browser-based arcade with multiple classic games. 
 
 ---
 
 ## What This Project Is All About
-
 I built Mini Arcade V1 as a complete, ready-to-play web experience that combines entertainment with practical web development techniques. It’s designed to be:
-
-- Super easy and instant to play - no setup, no servers, just open and click.
-- Visually appealing with a retro arcade aesthetic.
-- Actually fun while demonstrating modern JavaScript capabilities.
 
 Right now in V1 you get four games:
 - Memory Match – flip cards and test your brain
@@ -20,9 +13,7 @@ Right now in V1 you get four games:
 - Reaction Time Tester – how fast are your reflexes?
 - Web Dev Quiz – 10 questions that actually test real JavaScript & web knowledge
 
-
 ---
-
 
 ## How I Built It (Tech Stuff – Made Simple)
 
@@ -42,7 +33,6 @@ Core web dev concepts I showed off in V1:
 - Modular code (even though it’s one file right now)
 
 ---
-
 
 ## How Each Game Works in V1
 
@@ -71,11 +61,21 @@ Core web dev concepts I showed off in V1:
 
 ---
 
-## About version 2
-- I am currently working on the new version of this by adding the global leaderboard feature to this. And also it will consist of few moremind blowing games 
+## Version 1.2 Update 
+- I updated the site with 4 more fun games that i think works better 
+new games are :
+     - Snake
+     - Hangman 
+     - Word scramble
+     - Number guess
+- And i made an update so it will be able for you guys to make a account and play so you can share your scores with your friends 
+- And a new appearence is given.
+- The theme button is happening to have a bug I will fix it on the update 1.3
 
 ---
 
-## Project Files (V1)
+## Special notice for Hack club reviewers 
 
-This README.md was created and rewritten with the help of AI.
+- So i made this project by myself in vs code and live server i didnt know that i need to make commits as far as i can the first 18 hours of this project is not shown in commits because i made the commits after fully completing the project.
+
+- From the version 1.2 there will be commits for every feature of this site.
