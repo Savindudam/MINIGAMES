@@ -4,15 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini Arcade</title>
+    <title>Mini Arcade • Play Now</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
+    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-        // This is the database access for my site but you wont be able to access it so make your own 
+
         const firebaseConfig = {
             apiKey: "AIzaSyAaSCa2dRG55TC8h34ROdld3raUJn0o1zI",
             authDomain: "mini-arcade-v.firebaseapp.com",
@@ -23,9 +24,9 @@
             measurementId: "G-TWXCQYBW5L"
         };
 
-        const app = initializeApp(firebaseConfig);
+        const app  = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        const db   = getFirestore(app);
         const gProvider = new GoogleAuthProvider();
 
         window._fb = { auth, db, gProvider,
@@ -38,967 +39,1195 @@
 
         onAuthStateChanged(auth, user => {
             window._currentUser = user || null;
+            const playerNameEl = document.getElementById('player-name');
+            const navUsernameEl = document.getElementById('nav-username');
+            const authBtnEl = document.getElementById('auth-btn');
+            const navUserPillEl = document.getElementById('nav-user-pill');
+
             if (user) {
-                const name = (user.displayName || user.email.split('@')[0]);
-                document.getElementById('player-name').textContent = name;
-                document.getElementById('auth-btn').textContent = 'Log out';
-                document.getElementById('auth-btn').onclick = fbLogout;
-                document.getElementById('nav-username').textContent = name;
-                document.getElementById('nav-user-pill').style.display = 'flex';
+                const name = (user.displayName || user.email.split('@')[0]).toUpperCase();
+                if (playerNameEl) playerNameEl.textContent = name;
+                if (navUsernameEl) navUsernameEl.textContent = name;
+                if (authBtnEl) {
+                    authBtnEl.innerHTML = `<span class="text-[#00ff9d]">▼</span> LOGOUT`;
+                    authBtnEl.onclick = fbLogout;
+                }
+                if (navUserPillEl) navUserPillEl.style.display = 'flex';
             } else {
-                document.getElementById('player-name').textContent = 'Guest';
-                document.getElementById('auth-btn').textContent = 'Sign in';
-                document.getElementById('auth-btn').onclick = () => showAuthModal('login');
-                document.getElementById('nav-user-pill').style.display = 'none';
+                if (playerNameEl) playerNameEl.textContent = 'GUEST';
+                if (authBtnEl) {
+                    authBtnEl.innerHTML = `<span class="text-[#00ff9d]">▼</span> LOGIN`;
+                    authBtnEl.onclick = () => showAuthModal('login');
+                }
+                if (navUserPillEl) navUserPillEl.style.display = 'none';
             }
         });
+
+        // Authentication Functions
+        window.fbRegister = async function() {
+            const name  = document.getElementById('auth-name').value.trim();
+            const email = document.getElementById('auth-email').value.trim();
+            const pass  = document.getElementById('auth-pass').value;
+            const err   = document.getElementById('auth-error');
+            err.textContent = '';
+
+            if (!name || !email || !pass) { err.textContent = 'Fill in all fields.'; return; }
+            if (pass.length < 6) { err.textContent = 'Password must be 6+ characters.'; return; }
+
+            try {
+                setAuthLoading(true);
+                const { user } = await createUserWithEmailAndPassword(auth, email, pass);
+                await updateProfile(user, { displayName: name });
+                await setDoc(doc(db, 'users', user.uid), {
+                    displayName: name,
+                    email: user.email,
+                    createdAt: serverTimestamp()
+                });
+                hideAuthModal();
+            } catch(e) {
+                err.textContent = e.message.replace('Firebase: ', '').replace(/\(.*\)/, '');
+            } finally { setAuthLoading(false); }
+        };
+
+        window.fbLogin = async function() {
+            const email = document.getElementById('auth-email').value.trim();
+            const pass  = document.getElementById('auth-pass').value;
+            const err   = document.getElementById('auth-error');
+            err.textContent = '';
+
+            if (!email || !pass) { err.textContent = 'Fill in email and password.'; return; }
+
+            try {
+                setAuthLoading(true);
+                await signInWithEmailAndPassword(auth, email, pass);
+                hideAuthModal();
+            } catch(e) {
+                err.textContent = 'Invalid email or password.';
+            } finally { setAuthLoading(false); }
+        };
+
+        window.fbGoogleLogin = async function() {
+            try {
+                setAuthLoading(true);
+                const result = await signInWithPopup(auth, gProvider);
+                const user = result.user;
+                const snap = await getDoc(doc(db, 'users', user.uid));
+                if (!snap.exists()) {
+                    await setDoc(doc(db, 'users', user.uid), {
+                        displayName: user.displayName,
+                        email: user.email,
+                        createdAt: serverTimestamp()
+                    });
+                }
+                hideAuthModal();
+            } catch(e) {
+                document.getElementById('auth-error').textContent = e.message;
+            } finally { setAuthLoading(false); }
+        };
+
+        window.fbLogout = async function() {
+            await signOut(auth);
+        };
+
+        // Score Functions
+        window.fbSaveScore = async function(game, score) {
+            const user = auth.currentUser;
+            if (!user) {
+                showAuthModal('login');
+                alert('Please log in to save your score to the leaderboard!');
+                return false;
+            }
+            try {
+                await addDoc(collection(db, 'scores'), {
+                    uid:         user.uid,
+                    displayName: user.displayName || user.email.split('@')[0],
+                    game:        game,
+                    score:       score,
+                    createdAt:   serverTimestamp()
+                });
+                return true;
+            } catch(e) {
+                console.error('Save score error:', e);
+                return false;
+            }
+        };
+
+        window.fbLoadLeaderboard = async function() {
+            const games = ['memory', 'tictactoe', 'reaction', 'quiz', 'snake', 'scramble', 'numguess', 'hangman'];
+            const result = {};
+            for (const game of games) {
+                const q = query(
+                    collection(db, 'scores'),
+                    where('game', '==', game),
+                    orderBy('score', 'desc'),
+                    limit(10)
+                );
+                const snap = await getDocs(q);
+                result[game] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            }
+            return result;
+        };
+
+      window.fbLoadMyScores = async function() {
+            const user = auth.currentUser;
+            if (!user) return {};
+            const games = ['memory', 'tictactoe', 'reaction', 'quiz', 'snake', 'scramble', 'numguess', 'hangman'];
+            const result = {};
+            for (const game of games) {
+                const q = query(
+                    collection(db, 'scores'),
+                    where('uid', '==', user.uid),
+                    where('game', '==', game),
+                    orderBy('score', 'desc'),
+                    limit(5)
+                );
+                const snap = await getDocs(q);
+                result[game] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            }
+            return result;
+        };
     </script>
 
     <style>
-        :root { --neon: #10b981; }
-        body { font-family: 'Press Start 2P', system-ui; transition: background 0.3s, color 0.3s; }
+        :root { --neon: #00ff9d; }
+        body { font-family: 'Press Start 2P', system-ui; }
 
-        .game-card { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
-        .game-card:hover { transform: translateY(-5px); }
-        .light .game-card:hover { box-shadow: 0 8px 24px -4px rgb(16 185 129 / 0.15); }
-        .dark .game-card:hover { box-shadow: 0 8px 24px -4px rgb(16 185 129 / 0.25); }
+        .arcade-header { text-shadow: 0 0 10px var(--neon), 0 0 20px var(--neon); }
+
+        .game-card { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+        .game-card:hover { transform: scale(1.05) rotate(2deg); box-shadow: 0 0 30px rgba(0,255,157,0.5); }
+
+        .modal-anim { animation: modalPop 0.3s ease forwards; }
+        @keyframes modalPop {
+            0%   { transform: scale(0.9) translateY(20px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
 
         .flip-card { perspective: 1000px; }
-        .flip-card-inner { transition: transform 0.55s ease; transform-style: preserve-3d; }
+        .flip-card-inner { transition: transform 0.6s; transform-style: preserve-3d; }
         .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
         .flip-card-front, .flip-card-back { backface-visibility: hidden; }
         .flip-card-back { transform: rotateY(180deg); }
-        .modal-backdrop {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(4px);
-            z-index: 100;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .modal-box {
-            background: white;
-            border-radius: 1.5rem;
-            padding: 2rem;
-            width: 100%; max-width: 420px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-        }
-        .dark .modal-box { background: #18181b; color: white; }
 
-        .tab-btn { transition: all 0.2s; }
-        .tab-btn.active { background: #10b981; color: white; }
+        .board-cell { transition: all 0.2s ease; }
+        .board-cell:hover { background-color: rgba(0,255,157,0.1); }
+
+        .tab-btn.active { background: var(--neon); color: #000; }
+
+        input[type=text], input[type=email], input[type=password] {
+            background: #18181b; border: 2px solid #3f3f46;
+            color: white; border-radius: 1rem; padding: 0.75rem 1rem;
+            font-family: inherit; font-size: 0.6rem; outline: none; width: 100%;
+            transition: border-color 0.2s;
+        }
+        input:focus { border-color: var(--neon); }
+
+        .spin { animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .leaderboard-row:nth-child(1) .rank { color: #FFD700; }
+        .leaderboard-row:nth-child(2) .rank { color: #C0C0C0; }
+        .leaderboard-row:nth-child(3) .rank { color: #CD7F32; }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #18181b; }
+        ::-webkit-scrollbar-thumb { background: var(--neon); border-radius: 2px; }
     </style>
 </head>
-<body class="light bg-zinc-100 dark:bg-zinc-950 text-zinc-900 dark:text-white min-h-screen">
+<body class="bg-zinc-950 text-white min-h-screen">
 
-    <nav class="bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 py-4 px-6 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+    <!-- Navigation Bar -->
+    <nav class="bg-black border-b-4 border-[#00ff9d] py-4 px-8 flex items-center justify-between sticky top-0 z-50">
         <div class="flex items-center gap-3">
-            <div class="w-9 h-9 bg-emerald-500 text-white rounded-xl flex items-center justify-center text-xl">🎮</div>
-            <h1 class="text-lg font-bold tracking-widest">Mini Arcade</h1>
+            <div class="w-10 h-10 bg-[#00ff9d] text-black rounded-full flex items-center justify-center text-2xl">🎮</div>
+            <h1 class="text-3xl arcade-header tracking-widest">MINI ARCADE</h1>
         </div>
 
-        <div class="flex items-center gap-6 text-xs">
-            <button onclick="showScreen('home')" class="hover:text-emerald-500 transition-colors">Home</button>
-            <button onclick="openLeaderboard()" class="hover:text-emerald-500 transition-colors">Leaderboard</button>
-
-            <div id="nav-user-pill" class="hidden items-center gap-2 bg-zinc-100 dark:bg-zinc-800 px-4 py-1.5 rounded-full border border-zinc-300 dark:border-emerald-500">
-                <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
-                <span id="nav-username" class="font-bold text-xs">Guest</span>
+        <div class="flex items-center gap-8">
+            <div id="nav-user-pill" class="hidden items-center gap-3 bg-zinc-900 px-4 py-2 rounded-2xl border border-[#00ff9d]/30">
+                <div class="w-2 h-2 rounded-full bg-[#00ff9d] animate-pulse"></div>
+                <span id="nav-username" class="text-[0.6rem] font-bold tracking-tighter">GUEST</span>
             </div>
-        </div>
-
-        <div class="flex items-center gap-4">
-            <button onclick="toggleTheme()" id="theme-btn" class="text-2xl hover:scale-110 transition" title="Toggle theme">☀️</button>
-            <button id="auth-btn" onclick="showAuthModal('login')"
-                    class="px-5 py-2 border-2 border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white rounded-full text-xs font-bold transition">
-                Sign in
+            <button id="auth-btn" onclick="showAuthModal('login')" class="text-xs font-bold hover:text-[#00ff9d] transition tracking-widest">
+                <span class="text-[#00ff9d]">▼</span> LOGIN
             </button>
         </div>
     </nav>
-    <div id="screen-home" class="max-w-5xl mx-auto px-6 py-14">
-        <div class="text-center mb-12">
-<h2 class="text-3xl font-bold mb-3">Pick a game</h2>
+
+    <!-- Home Screen -->
+    <div id="screen-home" class="max-w-6xl mx-auto px-8 py-16">
+        <div class="mb-16">
+            <h2 class="text-4xl font-bold mb-4">WELCOME, <span id="player-name" class="text-[#00ff9d]">GUEST</span></h2>
+            <p class="text-zinc-500 text-xs tracking-widest">SELECT A MODULE TO INITIALIZE</p>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-
-            <div onclick="startGame('memory')" class="game-card bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-5 rounded-2xl cursor-pointer hover:border-emerald-500 dark:hover:border-emerald-500">
-                
-                <div class="font-bold text-sm mb-1">Memory Match</div>
-                <div class="text-xs text-zinc-400 leading-relaxed">Flip cards, find pairs — how fast is your memory?</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+   
+            <div onclick="startGame('memory')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
+                <div class="text-5xl mb-6 group-hover:scale-110 transition">🧠</div>
+                <h3 class="text-lg font-bold mb-2">MEMORY</h3>
+                <p class="text-zinc-500 text-[0.6rem] leading-relaxed">FIND ALL PAIRS BEFORE THE CLOCK RUNS OUT.</p>
             </div>
 
-            <div onclick="startGame('tictactoe')" class="game-card bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-5 rounded-2xl cursor-pointer hover:border-emerald-500 dark:hover:border-emerald-500">
-              
-                <div class="font-bold text-sm mb-1">Tic Tac Toe</div>
-                <div class="text-xs text-zinc-400 leading-relaxed">Classic 3×3 against a bot that actually tries.</div>
+            <div onclick="startGame('tictactoe')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
+                <div class="text-5xl mb-6 group-hover:scale-110 transition">❌</div>
+                <h3 class="text-lg font-bold mb-2">TIC TAC</h3>
+                <p class="text-zinc-500 text-[0.6rem] leading-relaxed">CLASSIC 3X3 BATTLE AGAINST THE MACHINE.</p>
             </div>
 
-            <div onclick="startGame('reaction')" class="game-card bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-5 rounded-2xl cursor-pointer hover:border-emerald-500 dark:hover:border-emerald-500">
-              
-                <div class="font-bold text-sm mb-1">Reaction Test</div>
-                <div class="text-xs text-zinc-400 leading-relaxed">Five rounds. Tap the moment you see green.</div>
+     
+            <div onclick="startGame('reaction')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
+                <div class="text-5xl mb-6 group-hover:scale-110 transition">⚡</div>
+                <h3 class="text-lg font-bold mb-2">REACTION</h3>
+                <p class="text-zinc-500 text-[0.6rem] leading-relaxed">TEST YOUR REFLEXES. CLICK WHEN IT TURNS GREEN.</p>
             </div>
 
-            <div onclick="startGame('quiz')" class="game-card bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-5 rounded-2xl cursor-pointer hover:border-emerald-500 dark:hover:border-emerald-500">
-              
-                <div class="font-bold text-sm mb-1">Web Dev Quiz</div>
-                <div class="text-xs text-zinc-400 leading-relaxed">10 questions on HTML, CSS, and JS.</div>
+            <div onclick="startGame('quiz')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
+                <div class="text-5xl mb-6 group-hover:scale-110 transition">❓</div>
+                <h3 class="text-lg font-bold mb-2">QUIZ</h3>
+                <p class="text-zinc-500 text-[0.6rem] leading-relaxed">10 QUESTIONS TO TEST YOUR WEB DEV KNOWLEDGE.</p>
             </div>
 
-            <div onclick="startGame('snake')" class="game-card bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-5 rounded-2xl cursor-pointer hover:border-emerald-500 dark:hover:border-emerald-500">
-             
-                <div class="font-bold text-sm mb-1">Snake</div>
-                <div class="text-xs text-zinc-400 leading-relaxed">Don't hit the walls. Don't eat yourself.</div>
+       
+            <div onclick="startGame('snake')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
+                <div class="text-5xl mb-6 group-hover:scale-110 transition">🐍</div>
+                <h3 class="text-lg font-bold mb-2">SNAKE</h3>
+                <p class="text-zinc-500 text-[0.6rem] leading-relaxed">EAT THE PIXELS. DON'T HIT THE WALLS.</p>
             </div>
 
-            <div onclick="startGame('scramble')" class="game-card bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-5 rounded-2xl cursor-pointer hover:border-emerald-500 dark:hover:border-emerald-500">
-             
-                <div class="font-bold text-sm mb-1">Word Scramble</div>
-                <div class="text-xs text-zinc-400 leading-relaxed">Jumbled letters, one word — type it before time's up.</div>
+         
+            <div onclick="startGame('scramble')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
+                <div class="text-5xl mb-6 group-hover:scale-110 transition">🔤</div>
+                <h3 class="text-lg font-bold mb-2">SCRAMBLE</h3>
+                <p class="text-zinc-500 text-[0.6rem] leading-relaxed">UNSCRAMBLE THE WORDS AS FAST AS POSSIBLE.</p>
             </div>
 
-            <div onclick="startGame('numguess')" class="game-card bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-5 rounded-2xl cursor-pointer hover:border-emerald-500 dark:hover:border-emerald-500">
-              
-    <div class="font-bold text-sm mb-1">Number Guess</div>
-                <div class="text-xs text-zinc-400 leading-relaxed">Somewhere between 1 and 100. You've got ten tries.</div>
+     
+            <div onclick="startGame('numguess')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
+                <div class="text-5xl mb-6 group-hover:scale-110 transition">🔢</div>
+                <h3 class="text-lg font-bold mb-2">GUESS</h3>
+                <p class="text-zinc-500 text-[0.6rem] leading-relaxed">FIND THE SECRET NUMBER BETWEEN 1 AND 100.</p>
             </div>
 
-            <div onclick="startGame('hangman')" class="game-card bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-5 rounded-2xl cursor-pointer hover:border-emerald-500 dark:hover:border-emerald-500">
-              
-                <div class="font-bold text-sm mb-1">Hangman</div>
-                <div class="text-xs text-zinc-400 leading-relaxed">Guess the word one letter at a time.</div>
+       
+            <div onclick="startGame('hangman')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
+                <div class="text-5xl mb-6 group-hover:scale-110 transition">🪝</div>
+                <h3 class="text-lg font-bold mb-2">HANGMAN</h3>
+                <p class="text-zinc-500 text-[0.6rem] leading-relaxed">GUESS THE WORD BEFORE THE MAN IS HANGED.</p>
             </div>
-
         </div>
 
-        <p class="text-center mt-12 text-zinc-400 dark:text-zinc-500 text-xs">
-            Sign in with email or Google to save scores globally
-        </p>
-    </div>
-    <div id="screen-game" class="hidden max-w-5xl mx-auto px-6 py-8">
-        <div class="flex items-center justify-between mb-8 flex-wrap gap-4">
-            <button onclick="returnToHome()"
-                    class="flex items-center gap-2 px-6 py-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-full text-xs font-bold hover:bg-zinc-50 dark:hover:bg-zinc-800 transition">
-                ← Back
+        <div class="mt-20 flex justify-center">
+            <button onclick="openLB()" class="px-12 py-5 bg-zinc-900 border-2 border-[#00ff9d] text-[#00ff9d] rounded-full font-bold text-xs tracking-[0.3em] hover:bg-[#00ff9d] hover:text-black transition shadow-[0_0_20px_rgba(0,255,157,0.2)]">
+                VIEW LEADERBOARD
             </button>
+        </div>
+    </div>
 
-            <div id="game-title" class="text-xl font-bold text-center flex-1"></div>
-
-            <div class="flex items-center gap-4">
+   
+    <div id="screen-game" class="hidden max-w-6xl mx-auto px-8 py-12">
+        <div class="flex items-center justify-between mb-12">
+            <button onclick="backToHome()" class="text-xs font-bold text-zinc-500 hover:text-white transition tracking-widest">
+                ← BACK TO MENU
+            </button>
+            <h2 id="game-title" class="text-2xl font-bold tracking-widest text-[#00ff9d]">GAME</h2>
+            <div class="flex items-center gap-6">
                 <div class="text-right">
-                    <div class="text-xs text-zinc-400 mb-0.5">Score</div>
-                    <div id="current-score" class="text-3xl font-bold text-emerald-500">0</div>
+                    <div class="text-[0.5rem] text-zinc-500 mb-1">CURRENT SCORE</div>
+                    <div id="current-score" class="text-2xl font-bold">0</div>
                 </div>
-                <button onclick="handleSaveScore()"
-                        class="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-black font-bold rounded-full text-xs transition">
-                    Save score
+                <button onclick="saveMyScore()" class="px-6 py-3 bg-[#00ff9d] text-black rounded-2xl font-bold text-[0.6rem] hover:bg-white transition">
+                    SAVE SCORE
                 </button>
             </div>
         </div>
-        <div id="game-memory" class="hidden">
-            <div class="flex justify-center gap-10 mb-8 text-center">        <div>
-                    <div class="text-xs text-zinc-400 mb-1">Moves</div>
-                    <div id="memory-moves" class="text-3xl font-bold">0</div>
-                </div>
-                <div>
-                    <div class="text-xs text-zinc-400 mb-1">Time</div>
-                    <div id="memory-timer" class="text-3xl font-bold">0:00</div>
-                </div>
-                <div>
-                    <div class="text-xs text-zinc-400 mb-1">Pairs found</div>
-                    <div id="memory-matches" class="text-3xl font-bold text-emerald-500">0/8</div>
-                </div>
+
+   
+        <div id="game-memory" class="hidden max-w-2xl mx-auto">
+            <div class="flex justify-around mb-8 text-center text-xs">
+                <div class="bg-zinc-900 px-6 py-3 rounded-2xl">MOVES: <span id="mem-moves" class="text-[#00ff9d] font-bold">0</span></div>
+                <div class="bg-zinc-900 px-6 py-3 rounded-2xl">TIME: <span id="mem-timer" class="text-[#00ff9d] font-bold">0:00</span></div>
+                <div class="bg-zinc-900 px-6 py-3 rounded-2xl">PAIRS: <span id="mem-pairs" class="text-[#00ff9d] font-bold">0/8</span></div>
             </div>
-            <div id="memory-grid" class="grid grid-cols-4 gap-3 max-w-xl mx-auto"></div>
+            <div id="mem-grid" class="grid grid-cols-4 gap-4"></div>
         </div>
-        <div id="game-tictactoe" class="hidden text-center">
-            <div id="ttt-status" class="text-sm mb-6 text-zinc-400">Your turn — you're X</div>
-            <div id="ttt-board" class="grid grid-cols-3 gap-3 max-w-xs mx-auto mb-6">
+
+        <div id="game-tictactoe" class="hidden max-w-sm mx-auto text-center">
+            <div id="ttt-status" class="text-xs text-zinc-500 mb-6 tracking-widest">YOUR TURN (X)</div>
+            <div id="ttt-board" class="grid grid-cols-3 gap-3 mb-8"></div>
+            <button onclick="initTTT()" class="px-8 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-2xl text-[0.6rem] font-bold transition">RESTART GAME</button>
+        </div>
+
+   
+        <div id="game-reaction" class="hidden max-w-xl mx-auto text-center">
+            <div id="reaction-best" class="text-xs text-zinc-500 mb-4">BEST: — ms</div>
+            <div id="reaction-display" onclick="handleReactionClick()" class="w-full aspect-square bg-zinc-900 rounded-3xl flex items-center justify-center cursor-pointer transition-colors border-4 border-zinc-800">
+                <div id="reaction-text" class="text-3xl font-bold">READY?</div>
             </div>
-            <button onclick="initTictactoe()" class="px-6 py-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-full text-xs font-bold hover:border-emerald-500 transition">
-                New game
+            <div id="reaction-results" class="grid grid-cols-5 gap-2 mt-8"></div>
+            <button id="reaction-start-btn" onclick="startReactionTest()" class="mt-8 px-12 py-4 bg-[#00ff9d] text-black rounded-3xl font-bold text-sm">START TEST</button>
+        </div>
+
+  
+        <div id="game-quiz" class="hidden max-w-2xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <div class="text-xs text-zinc-500">QUESTION <span id="quiz-current" class="text-white">1</span>/10</div>
+                <div id="quiz-timer" class="text-xl font-bold text-[#00ff9d]">00:00</div>
+                <div id="quiz-score-display" class="text-xs text-zinc-500">SCORE: <span class="text-[#00ff9d]">0</span></div>
+            </div>
+            <div id="quiz-question" class="text-xl font-bold mb-8 leading-relaxed"></div>
+            <div id="quiz-options" class="space-y-3"></div>
+            <button id="quiz-next-btn" onclick="nextQuizQuestion()" class="hidden mt-8 w-full py-4 bg-white text-black rounded-3xl font-bold text-sm">NEXT QUESTION →</button>
+        </div>
+
+    
+        <div id="game-snake" class="hidden max-w-xl mx-auto text-center">
+            <div class="flex justify-between mb-4 text-[0.6rem] text-zinc-500">
+                <div>SCORE: <span id="snake-score-display" class="text-white">0</span></div>
+                <div>BEST: <span id="snake-best-display" class="text-white">0</span></div>
+            </div>
+            <div class="relative inline-block">
+                <canvas id="snake-canvas" width="400" height="400" class="bg-zinc-900 rounded-2xl border-4 border-zinc-800"></canvas>
+                <div id="snake-overlay" class="absolute inset-0 bg-black/80 flex flex-center flex-col items-center justify-center rounded-2xl">
+                    <div id="snake-msg" class="text-xl font-bold mb-6">SNAKE</div>
+                    <button id="snake-start-btn" onclick="startSnake()" class="px-10 py-4 bg-[#00ff9d] text-black rounded-3xl font-bold text-xs">START</button>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-center gap-4">
+                <div class="p-3 bg-zinc-900 rounded-xl border border-zinc-800 text-[0.5rem]">ARROWS TO MOVE</div>
+            </div>
+        </div>
+
+    
+        <div id="game-scramble" class="hidden max-w-md mx-auto text-center">
+            <div class="flex justify-between mb-8 text-xs">
+                <div class="bg-zinc-900 px-4 py-2 rounded-xl">TIME: <span id="scramble-timer" class="text-[#00ff9d]">30</span>s</div>
+                <div class="bg-zinc-900 px-4 py-2 rounded-xl">SCORE: <span id="scramble-pts" class="text-[#00ff9d]">0</span></div>
+            </div>
+            <div id="scramble-word" class="text-5xl font-bold tracking-[0.3em] mb-4 text-[#00ff9d]">WORD</div>
+            <div id="scramble-hint" class="text-[0.6rem] text-zinc-500 mb-8 tracking-widest">HINT: —</div>
+            <input type="text" id="scramble-input" placeholder="TYPE ANSWER..." 
+                   onkeydown="if(event.key==='Enter') checkScramble()"
+                   class="text-center text-xl mb-6" style="font-family:inherit">
+            <div id="scramble-feedback" class="h-4 text-xs mb-6"></div>
+            <button onclick="checkScramble()" class="w-full py-4 bg-[#00ff9d] text-black rounded-3xl font-bold text-sm">SUBMIT</button>
+        </div>
+
+     
+        <div id="game-numguess" class="hidden max-w-md mx-auto text-center">
+            <div class="mb-8">
+                <div class="text-xs text-zinc-500 mb-2">ATTEMPTS LEFT</div>
+                <div id="numguess-lives" class="text-5xl font-bold text-[#00ff9d]">10</div>
+            </div>
+            <div id="numguess-hint" class="text-sm font-bold mb-8">GUESS A NUMBER (1–100)</div>
+            <div class="flex gap-3 justify-center mb-4">
+                <input type="number" id="numguess-input" min="1" max="100" placeholder="1–100"
+                       onkeydown="if(event.key==='Enter') submitGuess()"
+                       class="w-40 text-center text-2xl" style="font-family:inherit">
+                <button onclick="submitGuess()" class="px-8 py-3 bg-[#00ff9d] text-black rounded-3xl font-bold text-xs">GUESS</button>
+            </div>
+            <div id="numguess-history" class="flex flex-wrap gap-2 justify-center mt-4 max-h-32 overflow-y-auto"></div>
+            <div id="numguess-play-again" class="hidden mt-6">
+                <button onclick="initNumGuess()" class="px-12 py-4 bg-white text-black rounded-3xl font-bold text-sm">PLAY AGAIN</button>
+            </div>
+        </div>
+
+   
+        <div id="game-hangman" class="hidden max-w-2xl mx-auto w-full">
+            <div class="flex gap-8 mb-6 justify-center text-center text-xs">
+                <div class="bg-zinc-900 px-4 py-2 rounded-2xl">LIVES: <span id="hm-lives" class="text-[#00ff9d] font-bold">6</span></div>
+                <div class="bg-zinc-900 px-4 py-2 rounded-2xl">CATEGORY: <span id="hm-category" class="text-[#00ff9d] font-bold">—</span></div>
+                <div class="bg-zinc-900 px-4 py-2 rounded-2xl">STREAK: <span id="hm-streak" class="text-[#00ff9d] font-bold">0</span></div>
+            </div>
+            <div class="flex justify-center mb-4">
+                <svg id="hm-svg" viewBox="0 0 200 220" width="180" height="180">
+                    <line x1="20" y1="210" x2="180" y2="210" stroke="#3f3f46" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="60" y1="210" x2="60" y2="20" stroke="#3f3f46" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="60" y1="20" x2="130" y2="20" stroke="#3f3f46" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="130" y1="20" x2="130" y2="45" stroke="#3f3f46" stroke-width="4" stroke-linecap="round"/>
+                    <circle id="hm-head" cx="130" cy="60" r="15" stroke="#f43f5e" stroke-width="3" fill="none" class="hidden"/>
+                    <line id="hm-body" x1="130" y1="75" x2="130" y2="130" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" class="hidden"/>
+                    <line id="hm-larm" x1="130" y1="90" x2="105" y2="115" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" class="hidden"/>
+                    <line id="hm-rarm" x1="130" y1="90" x2="155" y2="115" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" class="hidden"/>
+                    <line id="hm-lleg" x1="130" y1="130" x2="105" y2="160" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" class="hidden"/>
+                    <line id="hm-rleg" x1="130" y1="130" x2="155" y2="160" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" class="hidden"/>
+                </svg>
+            </div>
+            <div id="hm-word" class="flex flex-wrap justify-center gap-3 mb-6 text-3xl font-bold tracking-widest"></div>
+            <div id="hm-hint" class="text-center text-xs text-zinc-500 mb-4"></div>
+            <div id="hm-keyboard" class="flex flex-wrap justify-center gap-2 mb-6"></div>
+            <div id="hm-result" class="hidden text-center">
+                <div id="hm-result-msg" class="text-2xl font-bold mb-2"></div>
+                <div id="hm-result-word" class="text-xs text-zinc-400 mb-4"></div>
+                <button onclick="initHangman()" class="px-12 py-4 bg-[#00ff9d] text-black rounded-3xl font-bold text-sm">NEXT WORD →</button>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="auth-modal" class="hidden fixed inset-0 bg-black/85 items-center justify-center z-[200]" style="display:none"
+         onclick="if(event.target.id==='auth-modal') hideAuthModal()">
+        <div class="modal-anim bg-zinc-900 w-full max-w-sm mx-4 rounded-3xl p-8 border-2 border-[#00ff9d]/30">
+   
+            <div class="flex mb-8 bg-zinc-800 rounded-2xl p-1 gap-1">
+                <button id="tab-login"    onclick="switchTab('login')"    class="tab-btn active flex-1 py-3 rounded-xl text-xs font-bold transition">LOGIN</button>
+                <button id="tab-register" onclick="switchTab('register')" class="tab-btn flex-1 py-3 rounded-xl text-xs font-bold transition text-zinc-400">REGISTER</button>
+            </div>
+
+            <div id="field-name" class="hidden mb-4">
+                <label class="text-xs text-zinc-400 mb-2 block">DISPLAY NAME</label>
+                <input type="text" id="auth-name" placeholder="Your arcade name">
+            </div>
+
+            <div class="mb-4">
+                <label class="text-xs text-zinc-400 mb-2 block">EMAIL</label>
+                <input type="email" id="auth-email" placeholder="player@arcade.com">
+            </div>
+
+            <div class="mb-2">
+                <label class="text-xs text-zinc-400 mb-2 block">PASSWORD</label>
+                <input type="password" id="auth-pass" placeholder="••••••••"
+                       onkeydown="if(event.key==='Enter') currentAuthTab==='login'?fbLogin():fbRegister()">
+            </div>
+
+            <p id="auth-error" class="text-red-400 text-xs min-h-[1rem] mb-4"></p>
+
+            <button id="auth-submit-btn"
+                    onclick="currentAuthTab==='login'?fbLogin():fbRegister()"
+                    class="w-full py-4 bg-[#00ff9d] text-black rounded-2xl font-bold text-sm uppercase mb-4 hover:bg-white transition flex items-center justify-center gap-2">
+                <span id="auth-btn-text">LOGIN</span>
+                <span id="auth-spinner" class="hidden spin text-lg">⟳</span>
             </button>
-        </div>
-        <div id="game-reaction" class="hidden text-center">
-            <div id="reaction-status" class="text-xs text-zinc-400 mb-4">Get ready...</div>
-            <div id="reaction-box"
-                 onclick="handleReactionClick()"
-                 class="w-72 h-72 mx-auto rounded-3xl bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center cursor-pointer transition-all text-sm font-bold select-none">
-                Wait for green...
+
+            <div class="relative flex items-center gap-3 mb-4">
+                <div class="flex-1 h-px bg-zinc-700"></div>
+                <span class="text-xs text-zinc-500">OR</span>
+                <div class="flex-1 h-px bg-zinc-700"></div>
             </div>
-            <div id="reaction-results" class="mt-6 text-xs text-zinc-400"></div>     </div>
-        <div id="game-quiz" class="hidden max-w-lg mx-auto">
-            <div class="flex justify-between text-xs text-zinc-400 mb-4">
-                <span id="quiz-progress">Question 1 of 10</span>
-                <span id="quiz-score-display">0 correct</span>
-            </div>
-            <div id="quiz-question" class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-2xl p-6 mb-4 text-sm leading-relaxed"></div>
-            <div id="quiz-options" class="grid grid-cols-1 gap-3"></div>
-            <div id="quiz-feedback" class="mt-4 text-xs text-center hidden"></div>
-        </div>
-        <div id="game-snake" class="hidden text-center">
-            <canvas id="snake-canvas" width="400" height="400" class="mx-auto rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900"></canvas>
-            <p class="text-xs text-zinc-400 mt-3">Arrow keys to move</p>
-        </div>
-        <div id="game-scramble" class="hidden max-w-sm mx-auto text-center">
-            <div id="scramble-word" class="text-3xl font-bold mb-6 tracking-widest text-emerald-500"></div>
-            <div id="scramble-hint" class="text-xs text-zinc-400 mb-6"></div>
-            <input id="scramble-input" type="text" placeholder="type your answer..."
-                   class="w-full px-4 py-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-full text-sm text-center outline-none focus:border-emerald-500 transition"
-                   onkeydown="if(event.key==='Enter') checkScramble()" />
-            <button onclick="checkScramble()" class="mt-4 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-black font-bold rounded-full text-xs transition">
-                Submit
+
+            <button onclick="fbGoogleLogin()"
+                    class="w-full py-4 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-2xl font-bold text-xs uppercase transition flex items-center justify-center gap-3">
+                <svg class="w-5 h-5" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                CONTINUE WITH GOOGLE
             </button>
-            <div id="scramble-feedback" class="mt-4 text-xs"></div>
-            <div id="scramble-timer" class="mt-2 text-xs text-zinc-400"></div>
-        </div>
-        <div id="game-numguess" class="hidden max-w-sm mx-auto text-center">
-            <div id="numguess-hint" class="text-xs text-zinc-400 mb-2">Pick a number between 1 and 100</div>
-            <div id="numguess-attempts" class="text-xs text-zinc-400 mb-6">Attempts left: 10</div>
-            <div class="flex gap-2 justify-center">
-                <input id="numguess-input" type="number" min="1" max="100" placeholder="..."
-                       class="w-28 px-4 py-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-full text-sm text-center outline-none focus:border-emerald-500 transition"
-                       onkeydown="if(event.key==='Enter') checkNumguess()" />
-                <button onclick="checkNumguess()" class="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-black font-bold rounded-full text-xs transition">
-                    Guess
-                </button>
-            </div>
-            <div id="numguess-feedback" class="mt-4 text-xs"></div>
-            <div id="numguess-history" class="mt-4 text-xs text-zinc-400 flex flex-wrap gap-2 justify-center"></div>
-        </div>
-        <div id="game-hangman" class="hidden max-w-sm mx-auto text-center">
-            <div id="hangman-drawing" class="text-6xl mb-4">🙂</div>
-            <div id="hangman-word" class="text-xl tracking-widest font-bold mb-4 text-emerald-500"></div>
-            <div id="hangman-hint" class="text-xs text-zinc-400 mb-4"></div>
-            <div id="hangman-keyboard" class="flex flex-wrap gap-2 justify-center mb-4"></div>
-            <div id="hangman-status" class="text-xs"></div>
-        </div>
 
+            <button onclick="hideAuthModal()" class="mt-4 w-full py-3 text-xs text-zinc-500 hover:text-white transition">CANCEL</button>
+        </div>
     </div>
-    <div id="auth-modal" class="modal-backdrop hidden" onclick="closeAuthIfOutside(event)">
-        <div class="modal-box dark:bg-zinc-900">
+
+    <div id="lb-modal" class="hidden fixed inset-0 bg-black/85 items-center justify-center z-[200]" style="display:none"
+         onclick="if(event.target.id==='lb-modal') closeLB()">
+        <div class="modal-anim bg-zinc-900 w-full max-w-xl mx-4 rounded-3xl p-8 border-2 border-[#00ff9d]/30 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-sm font-bold">Welcome back</h3>
-                <button onclick="closeAuthModal()" class="text-zinc-400 hover:text-zinc-600 text-lg">✕</button>
+                <h2 class="text-2xl font-bold">🏆 LEADERBOARD</h2>
+                <button onclick="closeLB()" class="text-zinc-500 hover:text-white transition text-xs">✕ CLOSE</button>
             </div>
 
-            <div class="flex gap-2 mb-6 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-full">
-                <button id="tab-login" onclick="switchAuthTab('login')" class="tab-btn active flex-1 py-2 rounded-full text-xs font-bold transition">Sign in</button>
-                <button id="tab-register" onclick="switchAuthTab('register')" class="tab-btn flex-1 py-2 rounded-full text-xs font-bold transition">Create account</button>
+            <div class="flex mb-6 bg-zinc-800 rounded-2xl p-1 gap-1">
+                <button id="lb-tab-global" onclick="switchLBTab('global')" class="tab-btn active flex-1 py-3 rounded-xl text-xs font-bold transition">🌍 GLOBAL</button>
+                <button id="lb-tab-mine"   onclick="switchLBTab('mine')"   class="tab-btn flex-1 py-3 rounded-xl text-xs font-bold transition text-zinc-400">👤 MY SCORES</button>
             </div>
 
-            <div id="auth-error" class="hidden text-xs text-red-500 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-xl mb-4"></div>
-
-            <div id="auth-login-form">
-                <input id="login-email" type="email" placeholder="Email" class="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl text-xs mb-3 outline-none border border-transparent focus:border-emerald-500 transition" />
-                <input id="login-password" type="password" placeholder="Password" class="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl text-xs mb-4 outline-none border border-transparent focus:border-emerald-500 transition" />
-                <button onclick="fbLogin()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-black font-bold rounded-xl text-xs transition mb-3">Sign in</button>
-                <button onclick="fbGoogleLogin()" class="w-full py-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:border-emerald-500 font-bold rounded-xl text-xs transition">Continue with Google</button>
+            <div class="flex gap-2 mb-6 flex-wrap">
+                <button onclick="selectLBGame('memory')"   id="lbg-memory"   class="lb-game-btn px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 transition">🧠 MEMORY</button>
+                <button onclick="selectLBGame('tictactoe')"id="lbg-tictactoe"class="lb-game-btn px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 transition">❌ TIC TAC</button>
+                <button onclick="selectLBGame('reaction')" id="lbg-reaction" class="lb-game-btn px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 transition">⚡ REACTION</button>
+                <button onclick="selectLBGame('quiz')"     id="lbg-quiz"     class="lb-game-btn px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 transition">❓ QUIZ</button>
+                <button onclick="selectLBGame('snake')"    id="lbg-snake"    class="lb-game-btn px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 transition">🐍 SNAKE</button>
+                <button onclick="selectLBGame('scramble')" id="lbg-scramble" class="lb-game-btn px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 transition">🔤 SCRAMBLE</button>
+                <button onclick="selectLBGame('numguess')" id="lbg-numguess" class="lb-game-btn px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 transition">🔢 NUM GUESS</button>
+                <button onclick="selectLBGame('hangman')"  id="lbg-hangman"  class="lb-game-btn px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 transition">🪝 HANGMAN</button>
             </div>
 
-            <div id="auth-register-form" class="hidden">
-                <input id="reg-name" type="text" placeholder="Display name" class="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl text-xs mb-3 outline-none border border-transparent focus:border-emerald-500 transition" />
-                <input id="reg-email" type="email" placeholder="Email" class="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl text-xs mb-3 outline-none border border-transparent focus:border-emerald-500 transition" />
-                <input id="reg-password" type="password" placeholder="Password (at least 6 chars)" class="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl text-xs mb-4 outline-none border border-transparent focus:border-emerald-500 transition" />
-                <button onclick="fbRegister()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-black font-bold rounded-xl text-xs transition mb-3">Create account</button>
-                <button onclick="fbGoogleLogin()" class="w-full py-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:border-emerald-500 font-bold rounded-xl text-xs transition">Continue with Google</button>
+            <div id="lb-content">
+                <div class="text-center py-12 text-zinc-500 text-xs">Loading scores...</div>
             </div>
-        </div>
-    </div>
-
-    <div id="lb-modal" class="modal-backdrop hidden" onclick="closeLbIfOutside(event)">
-        <div class="modal-box dark:bg-zinc-900 max-w-md">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-sm font-bold">Leaderboard</h3>
-                <button onclick="document.getElementById('lb-modal').classList.add('hidden')" class="text-zinc-400 hover:text-zinc-600 text-lg">✕</button>
-            </div>
-
-            <div id="lb-tabs" class="flex gap-2 flex-wrap mb-6">
-            </div>
-
-            <div id="lb-list" class="space-y-2 text-xs">
-                <div class="text-zinc-400 text-center py-4">Loading scores...</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="save-toast" class="fixed bottom-6 right-6 z-50 hidden">
-        <div class="bg-emerald-500 text-black font-bold px-5 py-3 rounded-full text-xs shadow-lg">
-            Score saved! 🎉
         </div>
     </div>
 
     <script>
-    let currentGame = null;
-    let isDark = false;
+        let currentGame  = null;
+        let isMuted      = false;
+        let currentAuthTab = 'login';
+        let lbData       = {};
+        let lbMyData     = {};
+        let lbTab        = 'global';
+        let lbGame       = 'memory';
 
-    function toggleTheme() {
-        isDark = !isDark;
-        document.documentElement.classList.toggle('dark', isDark);
-        document.body.classList.toggle('dark', isDark);
-        document.getElementById('theme-btn').textContent = isDark ? '🌙' : '☀️';
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    }
+        window._currentUser = null;
 
-    if (localStorage.getItem('theme') === 'dark') {
-        isDark = true;
-        document.documentElement.classList.add('dark');
-        document.body.classList.add('dark');
-        document.getElementById('theme-btn').textContent = '🌙';
-    }
+        function playSound(type) {
+            if (isMuted) return;
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
 
-    function showScreen(s) {
-        ['home','game'].forEach(id => {
-            document.getElementById('screen-' + id).classList.add('hidden');
-        });
-        document.getElementById('screen-' + s).classList.remove('hidden');
-    }
-
-    function startGame(game) {
-        currentGame = game;
-        showScreen('game');
-
-        document.querySelectorAll('[id^="game-"]').forEach(el => el.classList.add('hidden'));
-        const panel = document.getElementById('game-' + game);
-        if (panel) panel.classList.remove('hidden');
-
-        const titles = {
-            memory: 'Memory Match', tictactoe: 'Tic Tac Toe',
-            reaction: 'Reaction Test', quiz: 'Web Dev Quiz',
-            snake: 'Snake', scramble: 'Word Scramble',
-            numguess: 'Number Guess', hangman: 'Hangman'
-        };
-        document.getElementById('game-title').textContent = titles[game] || game;
-
-        updateCurrentScore(0);
-
-        const inits = {
-            memory: initMemory, tictactoe: initTictactoe,
-            reaction: initReaction, quiz: initQuiz,
-            snake: initSnake, scramble: initScramble,
-            numguess: initNumguess, hangman: initHangman
-        };
-        if (inits[game]) inits[game]();
-    }
-
-    function returnToHome() {
-        stopAll();
-        showScreen('home');
-    }
-
-    function updateCurrentScore(n) {
-        const el = document.getElementById('current-score');
-        if (el) el.textContent = Math.floor(n);
-    }
-
-    function stopAll() {
-        if (window._snakeLoop) { clearInterval(window._snakeLoop); window._snakeLoop = null; }
-        if (window._memoryTimer) { clearInterval(window._memoryTimer); window._memoryTimer = null; }
-        if (window._reactionTimeout) { clearTimeout(window._reactionTimeout); window._reactionTimeout = null; }
-        if (window._scrambleTimer) { clearInterval(window._scrambleTimer); window._scrambleTimer = null; }
-    }
-
-    async function handleSaveScore() {
-        if (!currentGame) return;
-        const score = parseInt(document.getElementById('current-score').textContent) || 0;
-        const user = window._currentUser;
-
-        if (!user) {
-            showAuthModal('login');
-            return;
+                if (type === 'click') {
+                    osc.type = 'sine'; osc.frequency.setValueAtTime(400, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                    osc.start(); osc.stop(ctx.currentTime + 0.1);
+                } else if (type === 'match') {
+                    osc.type = 'square'; osc.frequency.setValueAtTime(600, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.05, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+                    osc.start(); osc.stop(ctx.currentTime + 0.2);
+                } else if (type === 'win') {
+                    [523.25, 659.25, 783.99].forEach((f, i) => {
+                        const o = ctx.createOscillator();
+                        const g = ctx.createGain();
+                        o.connect(g); g.connect(ctx.destination);
+                        o.frequency.setValueAtTime(f, ctx.currentTime + i * 0.1);
+                        g.gain.setValueAtTime(0.05, ctx.currentTime + i * 0.1);
+                        g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.1 + 0.3);
+                        o.start(ctx.currentTime + i * 0.1); o.stop(ctx.currentTime + i * 0.1 + 0.3);
+                    });
+                }
+            } catch (e) {}
         }
 
-        try {
-            const { db, collection, addDoc, serverTimestamp } = window._fb;
-            await addDoc(collection(db, 'scores'), {
-                uid: user.uid,
-                name: user.displayName || user.email.split('@')[0],
-                game: currentGame,
-                score,
-                createdAt: serverTimestamp()
-            });
-            showToast();
-        } catch(e) {
-            console.error('Save failed:', e);
+        function showScreen(id) {
+            document.getElementById('screen-home').classList.add('hidden');
+            document.getElementById('screen-game').classList.add('hidden');
+            document.getElementById(id === 'home' ? 'screen-home' : 'screen-game').classList.remove('hidden');
         }
-    }
 
-    function showToast() {
-        const t = document.getElementById('save-toast');
-        t.classList.remove('hidden');
-        setTimeout(() => t.classList.add('hidden'), 2500);
-    }
+        function startGame(game) {
+            currentGame = game;
+            showScreen('game');
+            const titles = {
+                memory: 'MEMORY MATCH', tictactoe: 'TIC TAC TOE',
+                reaction: 'REACTION TEST', quiz: 'WEB DEV QUIZ',
+                snake: 'SNAKE ARCADE', scramble: 'WORD SCRAMBLE',
+                numguess: 'NUMBER GUESS', hangman: 'HANGMAN'
+            };
+            document.getElementById('game-title').textContent = titles[game] || game.toUpperCase();
+            document.querySelectorAll('[id^="game-"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById('game-' + game).classList.remove('hidden');
 
-    function showAuthModal(tab) {
-        document.getElementById('auth-modal').classList.remove('hidden');
-        switchAuthTab(tab);
-        document.getElementById('auth-error').classList.add('hidden');
-    }
+            updateCurrentScore(0);
+            stopAllGames();
 
-    function closeAuthModal() {
-        document.getElementById('auth-modal').classList.add('hidden');
-    }
-
-    function closeAuthIfOutside(e) {
-        if (e.target === document.getElementById('auth-modal')) closeAuthModal();
-    }
-
-    function switchAuthTab(tab) {
-        document.getElementById('auth-login-form').classList.toggle('hidden', tab !== 'login');
-        document.getElementById('auth-register-form').classList.toggle('hidden', tab !== 'register');
-        document.getElementById('tab-login').classList.toggle('active', tab === 'login');
-        document.getElementById('tab-register').classList.toggle('active', tab === 'register');
-        document.getElementById('tab-login').classList.toggle('text-zinc-500', tab !== 'login');
-        document.getElementById('tab-register').classList.toggle('text-zinc-500', tab !== 'register');
-    }
-
-    function showAuthError(msg) {
-        const el = document.getElementById('auth-error');
-        el.textContent = msg;
-        el.classList.remove('hidden');
-    }
-
-    async function fbLogin() {
-        const email = document.getElementById('login-email').value.trim();
-        const pass = document.getElementById('login-password').value;
-        if (!email || !pass) return showAuthError('Please fill in both fields.');
-        try {
-            const { auth, signInWithEmailAndPassword } = window._fb;
-            await signInWithEmailAndPassword(auth, email, pass);
-            closeAuthModal();
-        } catch(e) {
-            showAuthError(e.message.replace('Firebase: ', ''));
+            if (game === 'memory') initMemoryGame();
+            else if (game === 'tictactoe') initTTT();
+            else if (game === 'reaction') initReactionGame();
+            else if (game === 'quiz') initQuizGame();
+            else if (game === 'snake') initSnake();
+            else if (game === 'scramble') initScramble();
+            else if (game === 'numguess') initNumGuess();
+            else if (game === 'hangman') initHangman();
         }
-    }
 
-    async function fbRegister() {
-        const name = document.getElementById('reg-name').value.trim();
-        const email = document.getElementById('reg-email').value.trim();
-        const pass = document.getElementById('reg-password').value;
-        if (!name || !email || !pass) return showAuthError('All fields are required.');
-        try {
-            const { auth, createUserWithEmailAndPassword, updateProfile } = window._fb;
-            const cred = await createUserWithEmailAndPassword(auth, email, pass);
-            await updateProfile(cred.user, { displayName: name });
-            closeAuthModal();
-        } catch(e) {
-            showAuthError(e.message.replace('Firebase: ', ''));
+        function backToHome() {
+            stopAllGames();
+            showScreen('home');
         }
-    }
 
-    async function fbGoogleLogin() {
-        try {
-            const { auth, gProvider, signInWithPopup } = window._fb;
-            await signInWithPopup(auth, gProvider);
-            closeAuthModal();
-        } catch(e) {
-            showAuthError(e.message.replace('Firebase: ', ''));
+        function stopAllGames() {
+            if (window.memTimerInterval) clearInterval(window.memTimerInterval);
+            if (window.reactionTimeout) clearTimeout(window.reactionTimeout);
+            if (window.quizTimerInterval) clearInterval(window.quizTimerInterval);
+            if (window.snakeInterval) clearInterval(window.snakeInterval);
+            if (window.scrambleInterval) clearInterval(window.scrambleInterval);
         }
-    }
 
-    window.fbLogout = async () => {
-        const { auth, signOut } = window._fb;
-        await signOut(auth);
-    };
+        function updateCurrentScore(s) {
+            document.getElementById('current-score').textContent = Math.floor(s);
+        }
 
-    const gameNames = {
-        memory: 'Memory', tictactoe: 'Tic Tac Toe',
-        reaction: 'Reaction', quiz: 'Quiz',
-        snake: 'Snake', scramble: 'Scramble',
-        numguess: 'Num Guess', hangman: 'Hangman'
-    };
+        async function saveMyScore() {
+            const score = parseInt(document.getElementById('current-score').textContent);
+            if (score <= 0) { alert('Score must be greater than 0!'); return; }
+            const success = await window.fbSaveScore(currentGame, score);
+            if (success) alert('Score saved to leaderboard! 🏆');
+        }
 
-    async function openLeaderboard() {
-        document.getElementById('lb-modal').classList.remove('hidden');
-        loadLeaderboard('memory');
+        function showAuthModal(tab = 'login') {
+            document.getElementById('auth-modal').style.display = 'flex';
+            document.getElementById('auth-modal').classList.remove('hidden');
+            switchTab(tab);
+        }
 
-        const tabs = document.getElementById('lb-tabs');
-        tabs.innerHTML = Object.keys(gameNames).map(g => `
-            <button onclick="loadLeaderboard('${g}')" id="lb-tab-${g}"
-                class="px-3 py-1.5 rounded-full text-xs font-bold border border-zinc-200 dark:border-zinc-700 hover:border-emerald-500 transition">
-                ${gameNames[g]}
-            </button>`).join('');
-    }
+        function hideAuthModal() {
+            document.getElementById('auth-modal').style.display = 'none';
+            document.getElementById('auth-modal').classList.add('hidden');
+        }
 
-    function closeLbIfOutside(e) {
-        if (e.target === document.getElementById('lb-modal'))
+        function switchTab(tab) {
+            currentAuthTab = tab;
+            const isLogin = tab === 'login';
+            document.getElementById('tab-login').classList.toggle('active', isLogin);
+            document.getElementById('tab-login').classList.toggle('text-zinc-400', !isLogin);
+            document.getElementById('tab-register').classList.toggle('active', !isLogin);
+            document.getElementById('tab-register').classList.toggle('text-zinc-400', isLogin);
+            document.getElementById('field-name').classList.toggle('hidden', isLogin);
+            document.getElementById('auth-btn-text').textContent = isLogin ? 'LOGIN' : 'CREATE ACCOUNT';
+            document.getElementById('auth-error').textContent = '';
+        }
+
+        function setAuthLoading(l) {
+            document.getElementById('auth-spinner').classList.toggle('hidden', !l);
+            document.getElementById('auth-submit-btn').disabled = l;
+            document.getElementById('auth-submit-btn').style.opacity = l ? '0.7' : '1';
+        }
+
+        // Leaderboard UI
+        async function openLB() {
+            document.getElementById('lb-modal').style.display = 'flex';
+            document.getElementById('lb-modal').classList.remove('hidden');
+            lbData = await window.fbLoadLeaderboard();
+            lbMyData = await window.fbLoadMyScores();
+            renderLB();
+        }
+
+        function closeLB() {
+            document.getElementById('lb-modal').style.display = 'none';
             document.getElementById('lb-modal').classList.add('hidden');
-    }
+        }
 
-    async function loadLeaderboard(game) {
-        const list = document.getElementById('lb-list');
-        list.innerHTML = '<div class="text-zinc-400 text-center py-4">Loading...</div>';
-        try {
-            const { db, collection, query, orderBy, limit, getDocs, where } = window._fb;
-            const q = query(
-                collection(db, 'scores'),
-                where('game', '==', game),
-                orderBy('score', 'desc'),
-                limit(10)
-            );
-            const snap = await getDocs(q);
-            if (snap.empty) {
-                list.innerHTML = '<div class="text-zinc-400 text-center py-4">No scores yet — be the first!</div>';
+        function switchLBTab(t) {
+            lbTab = t;
+            document.getElementById('lb-tab-global').classList.toggle('active', t === 'global');
+            document.getElementById('lb-tab-global').classList.toggle('text-zinc-400', t !== 'global');
+            document.getElementById('lb-tab-mine').classList.toggle('active', t === 'mine');
+            document.getElementById('lb-tab-mine').classList.toggle('text-zinc-400', t !== 'mine');
+            renderLB();
+        }
+
+        function selectLBGame(g) {
+            lbGame = g;
+            document.querySelectorAll('.lb-game-btn').forEach(btn => {
+                btn.classList.remove('bg-[#00ff9d]', 'text-black');
+                btn.classList.add('bg-zinc-800');
+            });
+            document.getElementById('lbg-' + g).classList.add('bg-[#00ff9d]', 'text-black');
+            document.getElementById('lbg-' + g).classList.remove('bg-zinc-800');
+            renderLB();
+        }
+
+        function renderLB() {
+            const container = document.getElementById('lb-content');
+            const data = lbTab === 'global' ? (lbData[lbGame] || []) : (lbMyData[lbGame] || []);
+
+            if (data.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-zinc-500 text-xs">NO SCORES RECORDED YET</div>`;
                 return;
             }
-            const medals = ['🥇','🥈','🥉'];
-            list.innerHTML = snap.docs.map((d, i) => {
-                const data = d.data();
-                return `<div class="flex items-center justify-between bg-zinc-50 dark:bg-zinc-800 px-4 py-3 rounded-xl">
-                    <div class="flex items-center gap-3">
-                        <span>${medals[i] || `#${i+1}`}</span>
-                        <span class="font-bold">${data.name || 'Anonymous'}</span>
-                    </div>
-                    <span class="text-emerald-500 font-bold">${data.score}</span>
-                </div>`;
-            }).join('');
-        } catch(e) {
-            list.innerHTML = '<div class="text-zinc-400 text-center py-4">Couldn\'t load scores.</div>';
-        }
-    }
 
-    const memEmojis = ['🍎','🍌','🍒','🍇','🍉','🍓','🥝','🍍'];
-    let memCards = [], memFlipped = [], memLocked = false, memMoves = 0, memFound = 0, memSecs = 0;
-
-    function initMemory() {
-        memCards = [...memEmojis, ...memEmojis].sort(() => Math.random() - 0.5);
-        memFlipped = []; memLocked = false; memMoves = 0; memFound = 0; memSecs = 0;
-
-        document.getElementById('memory-moves').textContent = '0';
-        document.getElementById('memory-matches').textContent = '0/8';
-        document.getElementById('memory-timer').textContent = '0:00';
-
-        const grid = document.getElementById('memory-grid');
-        grid.innerHTML = memCards.map((emoji, i) => `
-            <div class="flip-card h-24 cursor-pointer" data-index="${i}" data-emoji="${emoji}">
-                <div class="flip-card-inner relative w-full h-full">
-                    <div class="flip-card-front absolute inset-0 bg-white dark:bg-zinc-800 border-2 border-emerald-500 rounded-xl flex items-center justify-center text-xl font-bold text-zinc-300">?</div>
-                    <div class="flip-card-back absolute inset-0 bg-white dark:bg-zinc-800 rounded-xl flex items-center justify-center text-4xl border-2 border-emerald-500">${emoji}</div>
+            container.innerHTML = `
+                <div class="space-y-2">
+                    ${data.map((d, i) => `
+                        <div class="leaderboard-row flex items-center justify-between bg-zinc-800/50 p-4 rounded-2xl border border-zinc-800">
+                            <div class="flex items-center gap-4">
+                                <span class="rank font-bold w-6">#${i + 1}</span>
+                                <span class="text-xs font-bold">${d.displayName.toUpperCase()}</span>
+                            </div>
+                            <span class="text-[#00ff9d] font-bold">${d.score}</span>
+                        </div>
+                    `).join('')}
                 </div>
-            </div>`).join('');
+            `;
+        }
 
-        grid.querySelectorAll('.flip-card').forEach(c => c.addEventListener('click', onMemCard));
+        const memIcons = ['🍎','🍌','🍒','🍇','🍉','🍓','🥝','🍍'];
+        let memCards=[], memFlipped=[], memLocked=false, memMoves=0, memPairs=0, memSeconds=0;
 
-        if (window._memoryTimer) clearInterval(window._memoryTimer);
-        window._memoryTimer = setInterval(() => {
-            memSecs++;
-            const m = Math.floor(memSecs/60), s = memSecs % 60;
-            document.getElementById('memory-timer').textContent = `${m}:${s.toString().padStart(2,'0')}`;
-        }, 1000);
-    }
+        function initMemoryGame() {
+            memCards = [...memIcons, ...memIcons].sort(() => Math.random() - 0.5);
+            memFlipped = []; memLocked = false; memMoves = 0; memPairs = 0; memSeconds = 0;
+            document.getElementById('mem-moves').textContent = '0';
+            document.getElementById('mem-pairs').textContent = '0/8';
+            document.getElementById('mem-timer').textContent = '0:00';
+            const grid = document.getElementById('mem-grid');
+            grid.innerHTML = memCards.map((icon, i) => `
+                <div class="flip-card aspect-square cursor-pointer" onclick="flipMemCard(this, ${i})">
+                    <div class="flip-card-inner relative w-full h-full">
+                        <div class="flip-card-front absolute inset-0 bg-zinc-800 rounded-2xl border-2 border-zinc-700 flex items-center justify-center text-2xl">?</div>
+                        <div class="flip-card-back absolute inset-0 bg-[#00ff9d] rounded-2xl flex items-center justify-center text-4xl">${icon}</div>
+                    </div>
+                </div>`).join('');
+            if (window.memTimerInterval) clearInterval(window.memTimerInterval);
+            window.memTimerInterval = setInterval(() => {
+                memSeconds++;
+                const m = Math.floor(memSeconds / 60), s = memSeconds % 60;
+                document.getElementById('mem-timer').textContent = `${m}:${s.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
 
-    function onMemCard(e) {
-        const card = e.currentTarget;
-        const idx = +card.dataset.index;
-        if (memLocked || card.classList.contains('flipped') || card.classList.contains('matched')) return;
-
-        card.classList.add('flipped');
-        memFlipped.push(card);
-
-        if (memFlipped.length === 2) {
-            memLocked = true;
-            memMoves++;
-            document.getElementById('memory-moves').textContent = memMoves;
-
-            const [a, b] = memFlipped;
-            if (a.dataset.emoji === b.dataset.emoji) {
-                a.classList.add('matched'); b.classList.add('matched');
-                memFound++;
-                document.getElementById('memory-matches').textContent = `${memFound}/8`;
-                memFlipped = []; memLocked = false;
-                if (memFound === 8) {
-                    clearInterval(window._memoryTimer);
-                    const score = Math.max(0, 1000 - memMoves * 10 - memSecs * 2);
-                    updateCurrentScore(score);
-                    setTimeout(() => alert(`Nice! You found all pairs in ${memMoves} moves and ${memSecs}s. Score: ${score}`), 200);
-                }
-            } else {
-                setTimeout(() => {
-                    a.classList.remove('flipped'); b.classList.remove('flipped');
+        function flipMemCard(el, i) {
+            if (memLocked || el.classList.contains('flipped') || memFlipped.includes(i)) return;
+            el.classList.add('flipped');
+            memFlipped.push({ el, i, icon: memCards[i] });
+            if (memFlipped.length === 2) {
+                memMoves++; document.getElementById('mem-moves').textContent = memMoves;
+                memLocked = true;
+                const [c1, c2] = memFlipped;
+                if (c1.icon === c2.icon) {
+                    memPairs++; document.getElementById('mem-pairs').textContent = `${memPairs}/8`;
                     memFlipped = []; memLocked = false;
-                }, 900);
+                    playSound('match');
+                    if (memPairs === 8) {
+                        clearInterval(window.memTimerInterval);
+                        const score = Math.max(0, 2000 - memMoves * 20 - memSeconds * 5);
+                        updateCurrentScore(score);
+                        playSound('win');
+                    }
+                } else {
+                    setTimeout(() => {
+                        c1.el.classList.remove('flipped');
+                        c2.el.classList.remove('flipped');
+                        memFlipped = []; memLocked = false;
+                    }, 1000);
+                }
             }
         }
-    }
 
-    let tttBoard = [], tttOver = false;
+        let tttBoard = [], tttActive = true;
 
-    function initTictactoe() {
-        tttBoard = Array(9).fill(null);
-        tttOver = false;
-        updateCurrentScore(0);
-        renderTTT();
-        document.getElementById('ttt-status').textContent = "Your turn — you're X";
-    }
+        function initTTT() {
+            tttBoard = Array(9).fill(null); tttActive = true;
+            document.getElementById('ttt-status').textContent = 'YOUR TURN (X)';
+            const board = document.getElementById('ttt-board');
+            board.innerHTML = tttBoard.map((_, i) => `
+                <div onclick="makeTTTMove(${i})" class="board-cell aspect-square bg-zinc-900 border-2 border-zinc-800 rounded-2xl flex items-center justify-center text-4xl font-bold cursor-pointer"></div>
+            `).join('');
+        }
 
-    function renderTTT() {
-        const board = document.getElementById('ttt-board');
-        board.innerHTML = tttBoard.map((cell, i) => `
-            <div onclick="tttMove(${i})"
-                 class="h-24 bg-white dark:bg-zinc-900 border-2 ${cell ? 'border-emerald-500' : 'border-zinc-200 dark:border-zinc-700 hover:border-emerald-400'} rounded-2xl flex items-center justify-center text-3xl font-bold cursor-pointer transition">
-                ${cell === 'X' ? '<span class="text-emerald-500">X</span>' : cell === 'O' ? '<span class="text-zinc-500">O</span>' : ''}
-            </div>`).join('');
-    }
-
-    function tttMove(i) {
-        if (tttBoard[i] || tttOver) return;
-        tttBoard[i] = 'X';
-        renderTTT();
-        const w = tttWinner(tttBoard);
-        if (w) { tttOver = true; document.getElementById('ttt-status').textContent = w === 'X' ? ' You win!' : " Bot wins!"; updateCurrentScore(w === 'X' ? 100 : 0); return; }
-        if (tttBoard.every(c => c)) { document.getElementById('ttt-status').textContent = "It's a draw!"; return; }
-
-        document.getElementById('ttt-status').textContent = 'Bot is thinking...';
-        setTimeout(() => {
-            const best = tttBotMove(tttBoard);
-            tttBoard[best] = 'O';
+        function makeTTTMove(i) {
+            if (!tttActive || tttBoard[i]) return;
+            tttBoard[i] = 'X';
             renderTTT();
-            const w2 = tttWinner(tttBoard);
-            if (w2) { tttOver = true; document.getElementById('ttt-status').textContent = 'Bot wins!'; updateCurrentScore(0); }
-            else if (tttBoard.every(c => c)) document.getElementById('ttt-status').textContent = "It's a draw!";
-            else document.getElementById('ttt-status').textContent = 'Your turn';
-        }, 400);
-    }
+            if (checkTTTWin('X')) { finishTTT('YOU WIN!'); updateCurrentScore(100); return; }
+            if (tttBoard.every(b => b)) { finishTTT("IT'S A DRAW"); return; }
+            tttActive = false;
+            document.getElementById('ttt-status').textContent = 'MACHINE THINKING...';
+            setTimeout(makeTTTBotMove, 600);
+        }
 
-    function tttWinner(b) {
-        const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-        for (const [a,c,d] of lines) if (b[a] && b[a] === b[c] && b[a] === b[d]) return b[a];
-        return null;
-    }
+        function makeTTTBotMove() {
+            const empty = tttBoard.map((b, i) => b === null ? i : null).filter(b => b !== null);
+            const move = empty[Math.floor(Math.random() * empty.length)];
+            tttBoard[move] = 'O';
+            renderTTT();
+            if (checkTTTWin('O')) { finishTTT('MACHINE WINS'); return; }
+            if (tttBoard.every(b => b)) { finishTTT("IT'S A DRAW"); return; }
+            tttActive = true;
+            document.getElementById('ttt-status').textContent = 'YOUR TURN (X)';
+        }
 
-    function tttBotMove(b) {
-        for (const player of ['O','X']) {
-            for (let i = 0; i < 9; i++) {
-                if (!b[i]) { b[i] = player; if (tttWinner(b)) { b[i] = null; if (player === 'O') return i; break; } b[i] = null; }
+        function renderTTT() {
+            const cells = document.querySelectorAll('.board-cell');
+            tttBoard.forEach((b, i) => {
+                cells[i].textContent = b;
+                if (b === 'X') cells[i].style.color = '#00ff9d';
+                if (b === 'O') cells[i].style.color = '#f43f5e';
+            });
+        }
+
+        function checkTTTWin(p) {
+            const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            return wins.some(w => w.every(i => tttBoard[i] === p));
+        }
+
+        function finishTTT(msg) {
+            tttActive = false;
+            document.getElementById('ttt-status').textContent = msg;
+            if (msg.includes('WIN')) playSound('win');
+        }
+
+        let reactionTimes=[], reactionStart=0, waitingForClick=false;
+
+        function initReactionGame() {
+            reactionTimes=[];
+            document.getElementById('reaction-results').innerHTML='';
+            document.getElementById('reaction-best').textContent='BEST: — ms';
+            document.getElementById('reaction-display').style.backgroundColor='#27272a';
+            document.getElementById('reaction-text').textContent='READY?';
+            document.getElementById('reaction-start-btn').classList.remove('hidden');
+            updateCurrentScore(0);
+        }
+
+        function startReactionTest() {
+            document.getElementById('reaction-start-btn').classList.add('hidden');
+            reactionTimes=[];
+            nextReactionRound();
+        }
+
+        function nextReactionRound() {
+            if(reactionTimes.length>=5){finishReactionTest();return;}
+            waitingForClick=false;
+            document.getElementById('reaction-display').style.backgroundColor='#27272a';
+            document.getElementById('reaction-text').textContent=`ROUND ${reactionTimes.length+1} — WAIT...`;
+            window.reactionTimeout=setTimeout(()=>{
+                waitingForClick=true; reactionStart=Date.now();
+                document.getElementById('reaction-display').style.backgroundColor='#00ff9d';
+                document.getElementById('reaction-text').innerHTML='<span style="color:#000">CLICK!</span>';
+                playSound('click');
+            }, Math.random()*3300+1200);
+        }
+
+        function handleReactionClick() {
+            if(!waitingForClick){
+                clearTimeout(window.reactionTimeout);
+                document.getElementById('reaction-display').style.backgroundColor='#f43f5e';
+                document.getElementById('reaction-text').textContent='TOO EARLY!';
+                reactionTimes.push(999);
+                setTimeout(nextReactionRound,1200);
+                return;
+            }
+            const t=Date.now()-reactionStart; waitingForClick=false;
+            reactionTimes.push(t);
+            document.getElementById('reaction-display').style.backgroundColor='#27272a';
+            document.getElementById('reaction-text').textContent=`✅ ${t}ms`;
+            const el=document.createElement('div');
+            el.className='px-4 py-2 bg-zinc-800 rounded-2xl text-center';
+            el.innerHTML=`<div class="text-xs text-zinc-400">R${reactionTimes.length}</div><div class="text-2xl font-bold">${t}</div>`;
+            document.getElementById('reaction-results').appendChild(el);
+            const best=Math.min(...reactionTimes);
+            document.getElementById('reaction-best').textContent=`BEST: ${best}ms`;
+            updateCurrentScore(Math.max(0,800-best));
+            setTimeout(nextReactionRound,900);
+        }
+
+        function finishReactionTest() {
+            const avg=Math.round(reactionTimes.reduce((a,b)=>a+b,0)/reactionTimes.length);
+            document.getElementById('reaction-text').innerHTML=`AVG<br><span class="text-5xl">${avg}ms</span>`;
+            document.getElementById('reaction-start-btn').textContent='PLAY AGAIN';
+            document.getElementById('reaction-start-btn').onclick=initReactionGame;
+            document.getElementById('reaction-start-btn').classList.remove('hidden');
+            playSound('win');
+        }
+        const quizQuestions = [
+            {q:"What does DOM stand for?",a:["Document Object Model","Data Object Manager","Display Order Map","Dynamic Output Module"],correct:0},
+            {q:"Which method adds an element to the END of an array?",a:["push()","pop()","shift()","unshift()"],correct:0},
+            {q:"CSS stands for...",a:["Creative Style Sheets","Cascading Style Sheets","Computer Style System","Colorful Styling Syntax"],correct:1},
+            {q:"Which event fires when a user clicks an element?",a:["onhover","onclick","onload","onchange"],correct:1},
+            {q:"How do you declare a constant in modern JS?",a:["var x = 10","let x = 10","const x = 10","constant x = 10"],correct:2},
+            {q:"localStorage is used for...",a:["Temporary session data","Persistent client-side storage","Server-side database","API caching only"],correct:1},
+            {q:"Which is NOT a JavaScript data type?",a:["string","boolean","float","object"],correct:2},
+            {q:"The 'this' keyword refers to...",a:["The global window","The object that called the function","The previous variable","A random value"],correct:1},
+            {q:"What does JSON.parse() do?",a:["Converts JSON string to object","Converts object to string","Formats JSON","Validates JSON"],correct:0},
+            {q:"Event delegation is useful because...",a:["Less memory","Faster code","Allows dynamic elements","All of the above"],correct:3}
+        ];
+
+        let quizIndex=0, quizScore=0, quizTimerInterval=null, quizSeconds=0;
+
+        function initQuizGame() {
+            quizIndex=0; quizScore=0; quizSeconds=0;
+            if(quizTimerInterval) clearInterval(quizTimerInterval);
+            quizTimerInterval=setInterval(()=>{
+                quizSeconds++;
+                document.getElementById('quiz-timer').textContent=
+                    `${String(Math.floor(quizSeconds/60)).padStart(2,'0')}:${String(quizSeconds%60).padStart(2,'0')}`;
+            },1000);
+            loadQuizQuestion();
+            updateCurrentScore(0);
+        }
+
+        function loadQuizQuestion() {
+            const q=quizQuestions[quizIndex];
+            document.getElementById('quiz-current').textContent=quizIndex+1;
+            document.getElementById('quiz-score-display').innerHTML=`SCORE: <span class="text-[#00ff9d]">${quizScore}</span>`;
+            document.getElementById('quiz-question').textContent=q.q;
+            document.getElementById('quiz-options').innerHTML=q.a.map((opt,i)=>`
+                <button onclick="selectQuizAnswer(${i})"
+                        class="quiz-option w-full text-left px-6 py-5 bg-zinc-800 hover:bg-zinc-700 rounded-3xl text-sm transition">
+                    ${String.fromCharCode(65+i)}. ${opt}
+                </button>`).join('');
+            document.getElementById('quiz-next-btn').classList.add('hidden');
+        }
+
+        function selectQuizAnswer(choice) {
+            const correct=quizQuestions[quizIndex].correct;
+            document.querySelectorAll('.quiz-option').forEach((btn,i)=>{
+                btn.disabled=true;
+                if(i===correct){btn.style.background='#00ff9d';btn.style.color='#000';}
+                if(i===choice&&i!==correct) btn.style.background='#f43f5e';
+            });
+            if(choice===correct){quizScore+=100;playSound('match');}else playSound('click');
+            document.getElementById('quiz-score-display').innerHTML=`SCORE: <span class="text-[#00ff9d]">${quizScore}</span>`;
+            document.getElementById('quiz-next-btn').classList.remove('hidden');
+        }
+
+        function nextQuizQuestion() {
+            quizIndex++;
+            if(quizIndex>=quizQuestions.length) finishQuiz();
+            else loadQuizQuestion();
+        }
+
+        function finishQuiz() {
+            clearInterval(quizTimerInterval);
+            const final=quizScore+Math.max(0,1000-quizSeconds*5);
+            document.getElementById('quiz-question').innerHTML=`
+                <div class="text-center">
+                    <div class="text-7xl mb-4">🏆</div>
+                    <div class="text-3xl font-bold">QUIZ COMPLETE!</div>
+                    <div class="text-6xl mt-6 text-[#00ff9d]">${final} PTS</div>
+                    <div class="text-sm mt-4 text-zinc-400">Time: ${document.getElementById('quiz-timer').textContent}</div>
+                    <button onclick="initQuizGame()" class="mt-8 px-12 py-4 bg-white text-black text-lg rounded-3xl">PLAY AGAIN</button>
+                </div>`;
+            document.getElementById('quiz-options').innerHTML='';
+            document.getElementById('quiz-next-btn').classList.add('hidden');
+            updateCurrentScore(final);
+            playSound('win');
+        }
+
+        let snakeCells, snakeDir, snakeNextDir, snakeFood, snakeBest = 0, snakePts = 0, snakeRunning = false;
+        const SNAKE_COLS = 20, SNAKE_ROWS = 20, CELL = 20;
+
+        function initSnake() {
+            snakeBest = parseInt(localStorage.getItem('snakeBest') || '0');
+            document.getElementById('snake-best-display').textContent = snakeBest;
+            document.getElementById('snake-overlay').classList.remove('hidden');
+            document.getElementById('snake-msg').textContent = 'Press START to play';
+            document.getElementById('snake-start-btn').textContent = 'START';
+            document.getElementById('snake-start-btn').onclick = startSnake;
+            snakeRunning = false;
+            if (window.snakeInterval) clearInterval(window.snakeInterval);
+            const canvas = document.getElementById('snake-canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#18181b';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            updateCurrentScore(0);
+        }
+
+        function startSnake() {
+            document.getElementById('snake-overlay').classList.add('hidden');
+            snakeCells = [{x:10,y:10},{x:9,y:10},{x:8,y:10}];
+            snakeDir = {x:1,y:0}; snakeNextDir = {x:1,y:0};
+            snakePts = 0;
+            document.getElementById('snake-score-display').textContent = '0';
+            placeSnakeFood();
+            snakeRunning = true;
+            if (window.snakeInterval) clearInterval(window.snakeInterval);
+            window.snakeInterval = setInterval(snakeTick, 130);
+        }
+
+        function placeSnakeFood() {
+            let pos;
+            do { pos = {x: Math.floor(Math.random()*SNAKE_COLS), y: Math.floor(Math.random()*SNAKE_ROWS)}; }
+            while (snakeCells.some(c => c.x===pos.x && c.y===pos.y));
+            snakeFood = pos;
+        }
+
+        function snakeTick() {
+            if (!snakeRunning) return;
+            snakeDir = snakeNextDir;
+            const head = {x: snakeCells[0].x + snakeDir.x, y: snakeCells[0].y + snakeDir.y};
+            if (head.x<0||head.x>=SNAKE_COLS||head.y<0||head.y>=SNAKE_ROWS||snakeCells.some(c=>c.x===head.x&&c.y===head.y)) {
+                snakeRunning = false;
+                clearInterval(window.snakeInterval);
+                if (snakePts > snakeBest) { snakeBest = snakePts; localStorage.setItem('snakeBest', snakeBest); document.getElementById('snake-best-display').textContent = snakeBest; }
+                document.getElementById('snake-msg').textContent = `GAME OVER — ${snakePts} PTS`;
+                document.getElementById('snake-start-btn').textContent = 'PLAY AGAIN';
+                document.getElementById('snake-overlay').classList.remove('hidden');
+                playSound('win');
+                updateCurrentScore(snakePts);
+                return;
+            }
+            snakeCells.unshift(head);
+            if (head.x === snakeFood.x && head.y === snakeFood.y) {
+                snakePts += 10;
+                document.getElementById('snake-score-display').textContent = snakePts;
+                placeSnakeFood();
+                playSound('match');
+            } else snakeCells.pop();
+            drawSnake();
+        }
+
+        function drawSnake() {
+            const canvas = document.getElementById('snake-canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#18181b';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#f43f5e';
+            ctx.fillRect(snakeFood.x*CELL+2, snakeFood.y*CELL+2, CELL-4, CELL-4);
+            snakeCells.forEach((c, i) => {
+                ctx.fillStyle = i === 0 ? '#00ff9d' : '#00cc7e';
+                ctx.fillRect(c.x*CELL+1, c.y*CELL+1, CELL-2, CELL-2);
+            });
+        }
+
+        window.addEventListener('keydown', e => {
+            if (!snakeRunning) return;
+            if (e.key === 'ArrowUp' && snakeDir.y === 0) snakeNextDir = {x:0,y:-1};
+            if (e.key === 'ArrowDown' && snakeDir.y === 0) snakeNextDir = {x:0,y:1};
+            if (e.key === 'ArrowLeft' && snakeDir.x === 0) snakeNextDir = {x:-1,y:0};
+            if (e.key === 'ArrowRight' && snakeDir.x === 0) snakeNextDir = {x:1,y:0};
+            if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) e.preventDefault();
+        });
+
+        const scrambleData = [
+            {w:"JAVASCRIPT",h:"The language of the web"},
+            {w:"FIREBASE",h:"Google's backend platform"},
+            {w:"TAILWIND",h:"Utility-first CSS framework"},
+            {w:"ARCADE",h:"A place to play games"},
+            {w:"VARIABLE",h:"A container for data"},
+            {w:"FUNCTION",h:"A reusable block of code"},
+            {w:"BROWSER",h:"Chrome, Firefox, Safari..."},
+            {w:"DATABASE",h:"Where scores are stored"}
+        ];
+        let scrambleIdx=0, scrambleTime=30, scramblePts=0;
+
+        function initScramble() {
+            scrambleIdx=0; scramblePts=0;
+            nextScrambleWord();
+        }
+
+        function nextScrambleWord() {
+            if (scrambleIdx >= scrambleData.length) { finishScramble(); return; }
+            const q = scrambleData[scrambleIdx];
+            const scrambled = q.w.split('').sort(() => Math.random() - 0.5).join('');
+            document.getElementById('scramble-word').textContent = scrambled;
+            document.getElementById('scramble-hint').textContent = `HINT: ${q.h}`;
+            document.getElementById('scramble-input').value = '';
+            document.getElementById('scramble-feedback').textContent = '';
+            scrambleTime = 30;
+            document.getElementById('scramble-timer').textContent = scrambleTime;
+            if (window.scrambleInterval) clearInterval(window.scrambleInterval);
+            window.scrambleInterval = setInterval(() => {
+                scrambleTime--;
+                document.getElementById('scramble-timer').textContent = scrambleTime;
+                if (scrambleTime <= 0) { scrambleIdx++; nextScrambleWord(); }
+            }, 1000);
+        }
+
+        function checkScramble() {
+            const val = document.getElementById('scramble-input').value.trim().toUpperCase();
+            if (val === scrambleData[scrambleIdx].w) {
+                scramblePts += 100 + scrambleTime * 5;
+                document.getElementById('scramble-pts').textContent = scramblePts;
+                document.getElementById('scramble-feedback').textContent = 'CORRECT! ✅';
+                document.getElementById('scramble-feedback').style.color = '#00ff9d';
+                playSound('match');
+                scrambleIdx++;
+                setTimeout(nextScrambleWord, 1000);
+            } else {
+                document.getElementById('scramble-feedback').textContent = 'TRY AGAIN ❌';
+                document.getElementById('scramble-feedback').style.color = '#f43f5e';
+                playSound('click');
             }
         }
-        if (!b[4]) return 4;
-        const corners = [0,2,6,8].filter(i => !b[i]);
-        if (corners.length) return corners[Math.floor(Math.random() * corners.length)];
-        return b.findIndex(c => !c);
-    }
 
-    let reactionRound = 0, reactionTimes = [], reactionWaiting = false, reactionStart = 0;
-
-    function initReaction() {
-        reactionRound = 0; reactionTimes = []; reactionWaiting = false;
-        document.getElementById('reaction-results').textContent = '';
-        nextReactionRound();
-    }
-
-    function nextReactionRound() {
-        if (reactionRound >= 5) {
-            const avg = Math.round(reactionTimes.reduce((a,b) => a+b, 0) / reactionTimes.length);
-            document.getElementById('reaction-status').textContent = `Done! Average: ${avg}ms`;
-            document.getElementById('reaction-results').textContent = reactionTimes.map((t,i) => `Round ${i+1}: ${t}ms`).join('  •  ');
-            const score = Math.max(0, Math.round(10000 / avg * 100));
-            updateCurrentScore(score);
-            return;
-        }
-        reactionRound++;
-        document.getElementById('reaction-status').textContent = `Round ${reactionRound} of 5 — wait for green`;
-        const box = document.getElementById('reaction-box');
-        box.className = 'w-72 h-72 mx-auto rounded-3xl bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center cursor-pointer transition-all text-sm font-bold select-none';
-        box.textContent = 'Wait...';
-        reactionWaiting = false;
-
-        const delay = 1500 + Math.random() * 3000;
-        window._reactionTimeout = setTimeout(() => {
-            box.className = 'w-72 h-72 mx-auto rounded-3xl bg-emerald-500 flex items-center justify-center cursor-pointer transition-all text-sm font-bold select-none text-black';
-            box.textContent = 'Tap now!';
-            reactionWaiting = true;
-            reactionStart = Date.now();
-        }, delay);
-    }
-
-    function handleReactionClick() {
-        if (!reactionWaiting) {
-            if (window._reactionTimeout) { clearTimeout(window._reactionTimeout); window._reactionTimeout = null; }
-            const box = document.getElementById('reaction-box');
-            box.className = 'w-72 h-72 mx-auto rounded-3xl bg-red-400 flex items-center justify-center cursor-pointer transition-all text-sm font-bold select-none text-white';
-            box.textContent = 'Too early! Tap to retry';
-            reactionWaiting = false;
-            setTimeout(nextReactionRound, 1000);
-            return;
-        }
-        const ms = Date.now() - reactionStart;
-        reactionTimes.push(ms);
-        reactionWaiting = false;
-        document.getElementById('reaction-status').textContent = `${ms}ms`;
-        setTimeout(nextReactionRound, 600);
-    }
-
-    const quizData = [
-        { q: 'What does CSS stand for?', opts: ['Cascading Style Sheets','Creative Style Syntax','Computer Style Sheets','Colorful Style Sheets'], a: 0 },
-        { q: 'Which HTML tag is used for the largest heading?', opts: ['<h6>','<heading>','<h1>','<head>'], a: 2 },
-        { q: 'What does the "box model" in CSS include?', opts: ['content, padding, border, margin','header, body, footer','div, span, p','color, font, size'], a: 0 },
-        { q: 'Which JavaScript method adds an element to the end of an array?', opts: ['push()','append()','add()','insert()'], a: 0 },
-        { q: 'What does "async/await" help with in JavaScript?', opts: ['Styling elements','Handling asynchronous operations','Selecting DOM nodes','Animating elements'], a: 1 },
-        { q: 'What is the default display value of a <div>?', opts: ['inline','flex','block','grid'], a: 2 },
-        { q: 'Which CSS property controls the stacking order of elements?', opts: ['position','z-index','order','layer'], a: 1 },
-        { q: 'What does "API" stand for?', opts: ['Application Programming Interface','Automated Program Integration','App Protocol Interface','Array Processing Index'], a: 0 },
-        { q: 'In JavaScript, which keyword declares a block-scoped variable?', opts: ['var','let','def','set'], a: 1 },
-        { q: 'Which HTTP method is typically used to submit a form?', opts: ['GET','DELETE','POST','PUT'], a: 2 }
-    ];
-
-    let quizIdx = 0, quizScore = 0, quizAnswered = false;
-
-    function initQuiz() {
-        quizIdx = 0; quizScore = 0; quizAnswered = false;
-        renderQuiz();
-    }
-
-    function renderQuiz() {
-        if (quizIdx >= quizData.length) {
-            document.getElementById('quiz-question').textContent = `You got ${quizScore} out of ${quizData.length}!`;
-            document.getElementById('quiz-options').innerHTML = `<button onclick="initQuiz()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-black font-bold rounded-xl text-xs transition">Play again</button>`;
-            document.getElementById('quiz-progress').textContent = 'Done!';
-            updateCurrentScore(quizScore * 10);
-            return;
-        }
-        const q = quizData[quizIdx];
-        quizAnswered = false;
-        document.getElementById('quiz-progress').textContent = `Question ${quizIdx + 1} of ${quizData.length}`;
-        document.getElementById('quiz-score-display').textContent = `${quizScore} correct`;
-        document.getElementById('quiz-question').textContent = q.q;
-        document.getElementById('quiz-feedback').classList.add('hidden');
-        document.getElementById('quiz-options').innerHTML = q.opts.map((opt, i) => `
-            <button onclick="answerQuiz(${i})"
-                    class="w-full py-3 px-5 text-left bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 hover:border-emerald-500 rounded-xl text-xs font-bold transition">
-                ${opt}
-            </button>`).join('');
-    }
-
-    function answerQuiz(i) {
-        if (quizAnswered) return;
-        quizAnswered = true;
-        const q = quizData[quizIdx];
-        const buttons = document.querySelectorAll('#quiz-options button');
-        buttons[q.a].classList.add('bg-emerald-100', 'dark:bg-emerald-900', 'border-emerald-500');
-        if (i !== q.a) buttons[i].classList.add('bg-red-100', 'dark:bg-red-900', 'border-red-400');
-        else quizScore++;
-
-        const fb = document.getElementById('quiz-feedback');
-        fb.textContent = i === q.a ? '✓ Correct!' : `✗ The answer was: ${q.opts[q.a]}`;
-        fb.className = `mt-4 text-xs text-center ${i === q.a ? 'text-emerald-500' : 'text-red-400'}`;
-        fb.classList.remove('hidden');
-
-        setTimeout(() => { quizIdx++; renderQuiz(); }, 1200);
-    }
-
-    let snake, dir, food, snakeScore;
-    const TILE = 20, COLS = 20, ROWS = 20;
-
-    function initSnake() {
-        snake = [{x:10,y:10},{x:9,y:10},{x:8,y:10}];
-        dir = {x:1,y:0}; snakeScore = 0;
-        placeFood();
-        if (window._snakeLoop) clearInterval(window._snakeLoop);
-        window._snakeLoop = setInterval(tickSnake, 130);
-        document.removeEventListener('keydown', snakeKey);
-        document.addEventListener('keydown', snakeKey);
-    }
-
-    function snakeKey(e) {
-        const keys = { ArrowUp:{x:0,y:-1}, ArrowDown:{x:0,y:1}, ArrowLeft:{x:-1,y:0}, ArrowRight:{x:1,y:0} };
-        const d = keys[e.key];
-        if (d && !(d.x === -dir.x && d.y === -dir.y)) { dir = d; e.preventDefault(); }
-    }
-
-    function placeFood() {
-        do { food = {x: Math.floor(Math.random()*COLS), y: Math.floor(Math.random()*ROWS)}; }
-        while (snake.some(s => s.x === food.x && s.y === food.y));
-    }
-
-    function tickSnake() {
-        const head = {x: snake[0].x + dir.x, y: snake[0].y + dir.y};
-        if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS || snake.some(s => s.x === head.x && s.y === head.y)) {
-            clearInterval(window._snakeLoop);
-            drawSnake(); 
-            const ctx = document.getElementById('snake-canvas').getContext('2d');
-            ctx.fillStyle = 'rgba(0,0,0,0.5)';
-            ctx.fillRect(0,0,400,400);
-            ctx.fillStyle = 'white';
-            ctx.font = '20px "Press Start 2P"';
-            ctx.textAlign = 'center';
-            ctx.fillText('Game Over', 200, 185);
-            ctx.font = '10px "Press Start 2P"';
-            ctx.fillText('Click to restart', 200, 215);
-            document.getElementById('snake-canvas').onclick = initSnake;
-            return;
-        }
-        snake.unshift(head);
-        if (head.x === food.x && head.y === food.y) {
-            snakeScore += 10; updateCurrentScore(snakeScore); placeFood();
-        } else snake.pop();
-        drawSnake();
-    }
-
-    function drawSnake() {
-        const canvas = document.getElementById('snake-canvas');
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0,0,400,400);
-        ctx.fillStyle = isDark ? '#18181b' : '#f4f4f5';
-        ctx.fillRect(0,0,400,400);
-        ctx.fillStyle = '#f43f5e';
-        ctx.beginPath();
-        ctx.roundRect(food.x*TILE+2, food.y*TILE+2, TILE-4, TILE-4, 4);
-        ctx.fill();
-        snake.forEach((seg, i) => {
-            ctx.fillStyle = i === 0 ? '#10b981' : '#34d399';
-            ctx.beginPath();
-            ctx.roundRect(seg.x*TILE+1, seg.y*TILE+1, TILE-2, TILE-2, 3);
-            ctx.fill();
-        });
-    }
-
-    const scrambleWords = [
-        {w:'javascript',h:'A programming language'},
-        {w:'variable',h:'Stores a value'},
-        {w:'function',h:'Reusable block of code'},
-        {w:'browser',h:'What you use to visit websites'},
-        {w:'keyboard',h:'You type on this'},
-        {w:'network',h:'Computers talking to each other'},
-        {w:'database',h:'Organized collection of data'},
-        {w:'algorithm',h:'Step-by-step instructions'}
-    ];
-    let scrambleIdx = 0, scrambleTimeLeft = 30, scramblePoints = 0;
-
-    function initScramble() {
-        scrambleIdx = 0; scramblePoints = 0;
-        nextScramble();
-    }
-
-    function nextScramble() {
-        if (scrambleIdx >= scrambleWords.length) {
-            document.getElementById('scramble-word').textContent = '';
-            document.getElementById('scramble-hint').textContent = `Done! You scored ${scramblePoints} points.`;
-            document.getElementById('scramble-input').style.display = 'none';
-            clearInterval(window._scrambleTimer);
-            updateCurrentScore(scramblePoints);
-            return;
-        }
-        scrambleTimeLeft = 30;
-        document.getElementById('scramble-input').style.display = '';
-        document.getElementById('scramble-input').value = '';
-        document.getElementById('scramble-feedback').textContent = '';
-        const {w, h} = scrambleWords[scrambleIdx];
-        const scrambled = w.split('').sort(() => Math.random() - 0.5).join('').toUpperCase();
-        document.getElementById('scramble-word').textContent = scrambled;
-        document.getElementById('scramble-hint').textContent = `Hint: ${h}`;
-        document.getElementById('scramble-timer').textContent = `${scrambleTimeLeft}s`;
-
-        if (window._scrambleTimer) clearInterval(window._scrambleTimer);
-        window._scrambleTimer = setInterval(() => {
-            scrambleTimeLeft--;
-            document.getElementById('scramble-timer').textContent = `${scrambleTimeLeft}s`;
-            if (scrambleTimeLeft <= 0) { clearInterval(window._scrambleTimer); scrambleIdx++; nextScramble(); }
-        }, 1000);
-    }
-
-    function checkScramble() {
-        const input = document.getElementById('scramble-input').value.trim().toLowerCase();
-        const correct = scrambleWords[scrambleIdx].w;
-        if (input === correct) {
-            scramblePoints += 10 + scrambleTimeLeft;
-            document.getElementById('scramble-feedback').textContent = '✓ Correct!';
-            document.getElementById('scramble-feedback').className = 'mt-4 text-xs text-emerald-500';
-            clearInterval(window._scrambleTimer);
-            updateCurrentScore(scramblePoints);
-            scrambleIdx++;
-            setTimeout(nextScramble, 600);
-        } else {
-            document.getElementById('scramble-feedback').textContent = 'Not quite — try again';
-            document.getElementById('scramble-feedback').className = 'mt-4 text-xs text-red-400';
-        }
-    }
-
-    let ngSecret, ngAttempts, ngHistory;
-
-    function initNumguess() {
-        ngSecret = Math.floor(Math.random() * 100) + 1;
-        ngAttempts = 10; ngHistory = [];
-        document.getElementById('numguess-hint').textContent = 'Pick a number between 1 and 100';
-        document.getElementById('numguess-attempts').textContent = `Attempts left: ${ngAttempts}`;
-        document.getElementById('numguess-feedback').textContent = '';
-        document.getElementById('numguess-history').innerHTML = '';
-        document.getElementById('numguess-input').value = '';
-        document.getElementById('numguess-input').disabled = false;
-    }
-
-    function checkNumguess() {
-        const n = parseInt(document.getElementById('numguess-input').value);
-        if (!n || n < 1 || n > 100) return;
-
-        ngAttempts--;
-        ngHistory.push(n);
-        document.getElementById('numguess-history').innerHTML = ngHistory.map(h =>
-            `<span class="px-2 py-1 bg-zinc-200 dark:bg-zinc-800 rounded-full">${h}</span>`).join('');
-
-        document.getElementById('numguess-input').value = '';
-
-        if (n === ngSecret) {
-            document.getElementById('numguess-feedback').textContent = `You Got it in ${10 - ngAttempts} tries!`;
-            document.getElementById('numguess-feedback').className = 'mt-4 text-xs text-emerald-500';
-            document.getElementById('numguess-input').disabled = true;
-            const score = ngAttempts * 10;
-            updateCurrentScore(score);
-            return;
+        function finishScramble() {
+            clearInterval(window.scrambleInterval);
+            document.getElementById('scramble-word').textContent = 'DONE!';
+            document.getElementById('scramble-hint').textContent = `FINAL SCORE: ${scramblePts}`;
+            updateCurrentScore(scramblePts);
+            playSound('win');
         }
 
-        document.getElementById('numguess-attempts').textContent = `Attempts left: ${ngAttempts}`;
-        if (ngAttempts === 0) {
-            document.getElementById('numguess-feedback').textContent = `The number was ${ngSecret}. Better luck next time!`;
-            document.getElementById('numguess-feedback').className = 'mt-4 text-xs text-red-400';
-            document.getElementById('numguess-input').disabled = true;
-        } else {
-            document.getElementById('numguess-hint').textContent = n < ngSecret ? 'Too low — go higher' : 'Too high — go lower';
+        let ngTarget, ngLives;
+
+        function initNumGuess() {
+            ngTarget = Math.floor(Math.random() * 100) + 1;
+            ngLives = 10;
+            document.getElementById('numguess-lives').textContent = ngLives;
+            document.getElementById('numguess-hint').textContent = 'GUESS A NUMBER (1–100)';
+            document.getElementById('numguess-history').innerHTML = '';
+            document.getElementById('numguess-input').value = '';
+            document.getElementById('numguess-play-again').classList.add('hidden');
+            updateCurrentScore(0);
         }
-    }
 
-    const hangWords = ['elephant','keyboard','javascript','mountain','umbrella','penguin','library','chocolate','telescope','adventure','butterfly','teleportation'];
-    const hangFaces = ['🙂','😐','😟','😨','😰','😱','💀'];
-    let hangWord, hangGuessed, hangWrong;
-
-    function initHangman() {
-        hangWord = hangWords[Math.floor(Math.random() * hangWords.length)];
-        hangGuessed = new Set(); hangWrong = 0;
-        renderHangman();
-    }
-
-    function renderHangman() {
-        document.getElementById('hangman-drawing').textContent = hangFaces[Math.min(hangWrong, hangFaces.length-1)];
-        document.getElementById('hangman-word').textContent = hangWord.split('').map(c => hangGuessed.has(c) ? c : '_').join(' ');
-        document.getElementById('hangman-hint').textContent = `Wrong guesses: ${hangWrong} / 6`;
-
-        const kb = document.getElementById('hangman-keyboard');
-        kb.innerHTML = 'abcdefghijklmnopqrstuvwxyz'.split('').map(l => `
-            <button onclick="guessLetter('${l}')" id="hk-${l}"
-                class="w-8 h-8 text-xs font-bold rounded-lg border ${hangGuessed.has(l) ? 'bg-zinc-200 dark:bg-zinc-700 text-zinc-400 border-zinc-200 dark:border-zinc-700 cursor-default' : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 hover:border-emerald-500 transition'}">
-                ${l}
-            </button>`).join('');
-    }
-
-    function guessLetter(l) {
-        if (hangGuessed.has(l)) return;
-        hangGuessed.add(l);
-        if (!hangWord.includes(l)) hangWrong++;
-        renderHangman();
-
-        const won = hangWord.split('').every(c => hangGuessed.has(c));
-        const lost = hangWrong >= 6;
-
-        if (won) {
-            document.getElementById('hangman-status').textContent = 'You got it! Yayyyyyyy';
-            document.getElementById('hangman-status').className = 'text-xs text-emerald-500';
-            updateCurrentScore(100 - hangWrong * 10);
-        } else if (lost) {
-            document.getElementById('hangman-word').textContent = hangWord;
-            document.getElementById('hangman-status').textContent = `The word was "${hangWord}"`;
-            document.getElementById('hangman-status').className = 'text-xs text-red-400';
+        function submitGuess() {
+            const val = parseInt(document.getElementById('numguess-input').value);
+            if (isNaN(val) || val < 1 || val > 100) return;
+            ngLives--;
+            document.getElementById('numguess-lives').textContent = ngLives;
+            const hist = document.getElementById('numguess-history');
+            const el = document.createElement('span');
+            el.className = 'px-3 py-1 bg-zinc-800 rounded-lg text-xs';
+            el.textContent = val;
+            hist.appendChild(el);
+            if (val === ngTarget) {
+                document.getElementById('numguess-hint').textContent = 'CORRECT! 🎉';
+                document.getElementById('numguess-play-again').classList.remove('hidden');
+                updateCurrentScore(ngLives * 100 + 100);
+                playSound('win');
+            } else if (ngLives <= 0) {
+                document.getElementById('numguess-hint').textContent = `GAME OVER! IT WAS ${ngTarget}`;
+                document.getElementById('numguess-play-again').classList.remove('hidden');
+            } else {
+                document.getElementById('numguess-hint').textContent = val < ngTarget ? 'HIGHER! ⬆️' : 'LOWER! ⬇️';
+                playSound('click');
+            }
+            document.getElementById('numguess-input').value = '';
         }
-    }
 
+        const hmData = [
+            {w:"FIREBASE",c:"TECH",h:"GOOGLE'S BACKEND"},
+            {w:"TAILWIND",c:"TECH",h:"CSS FRAMEWORK"},
+            {w:"JAVASCRIPT",c:"TECH",h:"WEB LANGUAGE"},
+            {w:"REACT",c:"TECH",h:"UI LIBRARY"},
+            {w:"PYTHON",c:"TECH",h:"SNAKE LANGUAGE"},
+            {w:"ARCADE",c:"GAME",h:"PLACE TO PLAY"},
+            {w:"PIXEL",c:"GAME",h:"TINY DOT"},
+            {w:"JOYSTICK",c:"GAME",h:"CONTROLLER"}
+        ];
+        let hmWord, hmGuessed, hmLives, hmStreak=0;
+
+        function initHangman() {
+            const q = hmData[Math.floor(Math.random() * hmData.length)];
+            hmWord = q.w; hmGuessed = []; hmLives = 6;
+            document.getElementById('hm-lives').textContent = hmLives;
+            document.getElementById('hm-category').textContent = q.c;
+            document.getElementById('hm-hint').textContent = `HINT: ${q.h}`;
+            document.getElementById('hm-streak').textContent = hmStreak;
+            document.getElementById('hm-result').classList.add('hidden');
+            document.getElementById('hm-keyboard').classList.remove('hidden');
+            document.getElementById('hm-word').classList.remove('hidden');
+            ['head','body','larm','rarm','lleg','rleg'].forEach(id => document.getElementById('hm-'+id).classList.add('hidden'));
+            renderHangman();
+        }
+
+        function renderHangman() {
+            document.getElementById('hm-word').innerHTML = hmWord.split('').map(l => `
+                <div class="w-10 h-12 border-b-4 border-zinc-700 flex items-center justify-center">
+                    ${hmGuessed.includes(l) ? l : ''}
+                </div>`).join('');
+            const kb = document.getElementById('hm-keyboard');
+            kb.innerHTML = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(l => `
+                <button onclick="guessHangman('${l}')" 
+                        ${hmGuessed.includes(l) ? 'disabled' : ''}
+                        class="w-10 h-10 bg-zinc-800 rounded-lg text-xs font-bold hover:bg-zinc-700 disabled:opacity-30 transition">
+                    ${l}
+                </button>`).join('');
+        }
+
+        function guessHangman(l) {
+            hmGuessed.push(l);
+            if (!hmWord.includes(l)) {
+                hmLives--;
+                document.getElementById('hm-lives').textContent = hmLives;
+                const parts = ['head','body','larm','rarm','lleg','rleg'];
+                document.getElementById('hm-' + parts[5-hmLives]).classList.remove('hidden');
+                playSound('click');
+            } else playSound('match');
+            renderHangman();
+            if (hmWord.split('').every(l => hmGuessed.includes(l))) finishHangman(true);
+            else if (hmLives <= 0) finishHangman(false);
+        }
+
+        function finishHangman(win) {
+            document.getElementById('hm-keyboard').classList.add('hidden');
+            document.getElementById('hm-result').classList.remove('hidden');
+            const msg = document.getElementById('hm-result-msg');
+            msg.textContent = win ? 'YOU SURVIVED!' : 'GAME OVER';
+            msg.style.color = win ? '#00ff9d' : '#f43f5e';
+            document.getElementById('hm-result-word').textContent = `THE WORD WAS: ${hmWord}`;
+            if (win) { hmStreak++; playSound('win'); updateCurrentScore(hmStreak * 200); }
+            else { hmStreak = 0; }
+        }
     </script>
 </body>
 </html>
