@@ -79,7 +79,7 @@ new games are :
  - so i wanted to make a data base but the normal lame one with sql was easier to make but harder to publish in another source so i used firebase and firestore.
  - I used AI to find how to auth with firebase and how to save the progress.
  - And I also used it to know how to check about the leaderboard but I cant figure it out much so it's still kinda messy (Don't worrry i will fix in near future)
- - I wanted a great theme and I used ai to scrape the web for some good UI's I found this on a site and made this project by myself ( I didnt copy the code i took a screen shot of it and coded myself)
+ - I wanted a great theme and I used ai to scrape the web for some good UI's I found this on a site and made this project by myself ( I didnt copy the code i took a screen shot of it and coded myself and you know I've looked at some source code too)
  - So overall i used AI to find stuff but i didnt directly copy it and paste it i made them myself in here
 
 ## Special notice for Hack club reviewers 
