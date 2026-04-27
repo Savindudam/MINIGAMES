@@ -558,6 +558,8 @@
     </div>
 
     <script>
+
+        
         let currentGame  = null;
         let isMuted      = false;
         let currentAuthTab = 'login';
@@ -875,7 +877,7 @@
             document.getElementById('reaction-display').style.backgroundColor='#27272a';
             document.getElementById('reaction-text').textContent=`ROUND ${reactionTimes.length+1} — WAIT...`;
             window.reactionTimeout=setTimeout(()=>{
-                waitingForClick=true; reactionStart=Date.now();
+                waitingForClick=true; reactionStart=Date.now();     
                 document.getElementById('reaction-display').style.backgroundColor='#00ff9d';
                 document.getElementById('reaction-text').innerHTML='<span style="color:#000">CLICK!</span>';
                 playSound('click');
@@ -894,7 +896,7 @@
             const t=Date.now()-reactionStart; waitingForClick=false;
             reactionTimes.push(t);
             document.getElementById('reaction-display').style.backgroundColor='#27272a';
-            document.getElementById('reaction-text').textContent=`✅ ${t}ms`;
+            document.getElementById('reaction-text').textContent=`✅ ${t}ms`            ;
             const el=document.createElement('div');
             el.className='px-4 py-2 bg-zinc-800 rounded-2xl text-center';
             el.innerHTML=`<div class="text-xs text-zinc-400">R${reactionTimes.length}</div><div class="text-2xl font-bold">${t}</div>`;
@@ -940,7 +942,7 @@
             updateCurrentScore(0);
         }
 
-        function loadQuizQuestion() {
+     function loadQuizQuestion() {
             const q=quizQuestions[quizIndex];
             document.getElementById('quiz-current').textContent=quizIndex+1;
             document.getElementById('quiz-score-display').innerHTML=`SCORE: <span class="text-[#00ff9d]">${quizScore}</span>`;
@@ -1051,7 +1053,7 @@
             drawSnake();
         }
 
-        function drawSnake() {
+    function drawSnake() {
             const canvas = document.getElementById('snake-canvas');
             const ctx = canvas.getContext('2d');
             ctx.fillStyle = '#18181b';
@@ -1235,6 +1237,6 @@
             if (win) { hmStreak++; playSound('win'); updateCurrentScore(hmStreak * 200); }
             else { hmStreak = 0; }
         }
-    </script>
+</script>
 </body>
 </html>
