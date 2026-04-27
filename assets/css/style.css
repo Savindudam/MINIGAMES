@@ -1,0 +1,42 @@
+:root { --neon: #00ff9d; }
+body { font-family: 'Press Start 2P', system-ui; }
+
+.arcade-header { text-shadow: 0 0 10px var(--neon), 0 0 20px var(--neon); }
+
+.game-card { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+.game-card:hover { transform: scale(1.05) rotate(2deg); box-shadow: 0 0 30px rgba(0,255,157,0.5); }
+.modal-anim { animation: modalPop 0.3s ease forwards; }
+@keyframes modalPop {
+    0%   { transform: scale(0.9) translateY(20px); opacity: 0; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.flip-card { perspective: 1000px; }
+.flip-card-inner { transition: transform 0.6s; transform-style: preserve-3d; }
+.flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+.flip-card-front, .flip-card-back { backface-visibility: hidden; }
+.flip-card-back { transform: rotateY(180deg); }
+
+.board-cell { transition: all 0.2s ease; }
+.board-cell:hover { background-color: rgba(0,255,157,0.1); }
+
+.tab-btn.active { background: var(--neon); color: #000; }
+
+input[type=text], input[type=email], input[type=password] {
+    background: #18181b; border: 2px solid #3f3f46;
+    color: white; border-radius: 1rem; padding: 0.75rem 1rem;
+    font-family: inherit; font-size: 0.6rem; outline: none; width: 100%;
+    transition: border-color 0.2s;
+}
+input:focus { border-color: var(--neon); }
+
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.leaderboard-row:nth-child(1) .rank { color: #FFD700; }
+.leaderboard-row:nth-child(2) .rank { color: #C0C0C0; }
+.leaderboard-row:nth-child(3) .rank { color: #CD7F32; }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #18181b; }
+::-webkit-scrollbar-thumb { background: var(--neon); border-radius: 2px; }
