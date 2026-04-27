@@ -74,6 +74,14 @@ new games are :
 
 ---
 
+### AI usage 
+ I used AI's help for finding how to do this stuff
+ - so i wanted to make a data base but the normal lame one with sql was easier to make but harder to publish in another source so i used firebase.
+ - I used AI to find how to auth with firebase and how to save the progress.
+ - And I also used it to know how to check about the leaderboard but I cant figure it out much so it's still kinda messy (Don't worrry i will fix in near future)
+ - I wanted a great theme and I used ai to scrape the web for some good UI's I found this on a site and made this project by myself ( I didnt copy the code i took a screen shot of it and coded myself)
+ - So overall i used AI to find stuff but i didnt directly copy it and paste it i made them myself in here
+
 ## Special notice for Hack club reviewers 
 
 - So i made this project by myself in vs code and live server i didnt know that i need to make commits as far as i can the first 18 hours of this project is not shown in commits because i made the commits after fully completing the project.
