@@ -76,7 +76,7 @@ new games are :
 
 ### AI usage 
  I used AI's help for finding how to do this stuff
- - so i wanted to make a data base but the normal lame one with sql was easier to make but harder to publish in another source so i used firebase.
+ - so i wanted to make a data base but the normal lame one with sql was easier to make but harder to publish in another source so i used firebase and firestore.
  - I used AI to find how to auth with firebase and how to save the progress.
  - And I also used it to know how to check about the leaderboard but I cant figure it out much so it's still kinda messy (Don't worrry i will fix in near future)
  - I wanted a great theme and I used ai to scrape the web for some good UI's I found this on a site and made this project by myself ( I didnt copy the code i took a screen shot of it and coded myself)

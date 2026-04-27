@@ -14,14 +14,14 @@
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAaSCa2dRG55TC8h34ROdld3raUJn0o1zI",
-            authDomain: "mini-arcade-v.firebaseapp.com",
-            projectId: "mini-arcade-v",
-            storageBucket: "mini-arcade-v.firebasestorage.app",
-            messagingSenderId: "126236166995",
-            appId: "1:126236166995:web:437f6c6f5ea7f915ecafa6",
-            measurementId: "G-TWXCQYBW5L"
+                                                                                                                                                                                                                                                                    const firebaseConfig = {
+                                                                                                                                                                                                                                                                                                        apiKey: "AIzaSyAaSCa2dRG55TC8h34ROdld3raUJn0o1zI",
+                                                                                                                                                                                                                                                                                                        authDomain: "mini-arcade-v.firebaseapp.com",
+                                                                                                                                                                                                                                                                                                        projectId: "mini-arcade-v",
+                                                                                                                                                                                                                                                                                                        storageBucket: "mini-arcade-v.firebasestorage.app",
+                                                                                                                                                                                                                                                                                                        messagingSenderId: "126236166995",
+                                                                                                                                                                                                                                                                                                        appId: "1:126236166995:web:437f6c6f5ea7f915ecafa6",
+                                                                                                                                                                                                                                                                                                        measurementId: "G-TWXCQYBW5L"
         };
 
         const app  = initializeApp(firebaseConfig);
@@ -255,7 +255,7 @@
     </nav>
 
     <!-- Home Screen -->
-    <div id="screen-home" class="max-w-6xl mx-auto px-8 py-16">
+<div id="screen-home" class="max-w-6xl mx-auto px-8 py-16">
         <div class="mb-16">
             <h2 class="text-4xl font-bold mb-4">WELCOME TO GAMES HUB , <span id="player-name" class="text-[#00ff9d]">GUEST</span></h2>
             <p class="text-zinc-500 text-xs tracking-widest">SELECT A GAME TO PLAY</p>
@@ -414,7 +414,7 @@
         </div>
 
      
-        <div id="game-numguess" class="hidden max-w-md mx-auto text-center">
+<div id="game-numguess" class="hidden max-w-md mx-auto text-center">
             <div class="mb-8">
                 <div class="text-xs text-zinc-500 mb-2">ATTEMPTS LEFT</div>
                 <div id="numguess-lives" class="text-5xl font-bold text-[#00ff9d]">10</div>
@@ -457,6 +457,9 @@
             <div id="hm-hint" class="text-center text-xs text-zinc-500 mb-4"></div>
             <div id="hm-keyboard" class="flex flex-wrap justify-center gap-2 mb-6"></div>
             <div id="hm-result" class="hidden text-center">
+
+
+
                 <div id="hm-result-msg" class="text-2xl font-bold mb-2"></div>
                 <div id="hm-result-word" class="text-xs text-zinc-400 mb-4"></div>
                 <button onclick="initHangman()" class="px-12 py-4 bg-[#00ff9d] text-black rounded-3xl font-bold text-sm">NEXT WORD →</button>
@@ -483,6 +486,9 @@
                 <label class="text-xs text-zinc-400 mb-2 block">EMAIL</label>
                 <input type="email" id="auth-email" placeholder="player@arcade.com">
             </div>
+
+
+
 
             <div class="mb-2">
                 <label class="text-xs text-zinc-400 mb-2 block">PASSWORD</label>
