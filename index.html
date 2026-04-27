@@ -352,7 +352,7 @@
             <div id="mem-grid" class="grid grid-cols-4 gap-4"></div>
         </div>
 
-        <div id="game-tictactoe" class="hidden max-w-sm mx-auto text-center">
+<div id="game-tictactoe" class="hidden max-w-sm mx-auto text-center">
             <div id="ttt-status" class="text-xs text-zinc-500 mb-6 tracking-widest">YOUR TURN (X)</div>
             <div id="ttt-board" class="grid grid-cols-3 gap-3 mb-8"></div>
             <button onclick="initTTT()" class="px-8 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-2xl text-[0.6rem] font-bold transition">RESTART GAME</button>
@@ -389,7 +389,7 @@
             <div class="relative inline-block">
                 <canvas id="snake-canvas" width="400" height="400" class="bg-zinc-900 rounded-2xl border-4 border-zinc-800"></canvas>
                 <div id="snake-overlay" class="absolute inset-0 bg-black/80 flex flex-center flex-col items-center justify-center rounded-2xl">
-                    <div id="snake-msg" class="text-xl font-bold mb-6">SNAKE</div>
+                     <div id="snake-msg" class="text-xl font-bold mb-6">SNAKE</div>
                     <button id="snake-start-btn" onclick="startSnake()" class="px-10 py-4 bg-[#00ff9d] text-black rounded-3xl font-bold text-xs">START</button>
                 </div>
             </div>
@@ -541,6 +541,7 @@
 
             <div class="flex gap-2 mb-6 flex-wrap">
                 <button onclick="selectLBGame('memory')"   id="lbg-memory"   class="lb-game-btn px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 transition"> MEMORY</button>
+               
                 <button onclick="selectLBGame('tictactoe')"id="lbg-tictactoe"class="lb-game-btn px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 transition"> TIC TAC</button>
                 <button onclick="selectLBGame('reaction')" id="lbg-reaction" class="lb-game-btn px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 transition"> REACTION</button>
                 <button onclick="selectLBGame('quiz')"     id="lbg-quiz"     class="lb-game-btn px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 transition"> QUIZ</button>
@@ -682,7 +683,7 @@
 
         function setAuthLoading(l) {
             document.getElementById('auth-spinner').classList.toggle('hidden', !l);
-            document.getElementById('auth-submit-btn').disabled = l;
+    document.getElementById('auth-submit-btn').disabled = l;
             document.getElementById('auth-submit-btn').style.opacity = l ? '0.7' : '1';
         }
 
@@ -771,7 +772,7 @@
 
         function flipMemCard(el, i) {
             if (memLocked || el.classList.contains('flipped') || memFlipped.includes(i)) return;
-            el.classList.add('flipped');
+             el.classList.add('flipped');
             memFlipped.push({ el, i, icon: memCards[i] });
             if (memFlipped.length === 2) {
                 memMoves++; document.getElementById('mem-moves').textContent = memMoves;
@@ -1015,7 +1016,7 @@
             placeSnakeFood();
             snakeRunning = true;
             if (window.snakeInterval) clearInterval(window.snakeInterval);
-            window.snakeInterval = setInterval(snakeTick, 130);
+            window.snakeInterval = setInterval(snakeTick, 130);h
         }
 
         function placeSnakeFood() {
