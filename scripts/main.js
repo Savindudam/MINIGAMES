@@ -6,15 +6,18 @@ let lbMyData       = {};
 let lbTab          = 'global';
 let lbGame         = 'global';
 
+// Discord Webhook Pls dont do anything 
+const WEBHOOK_URL = 'https://discord.com/api/webhooks/1498357537882374385/z1zIAOlOjJI36RfGm1z9IXnAMgEjlK-VKiCM2xLgAyzPPyq4p0O-js-hDKLqZ17zJmY3';
+
 const GAME_REGISTRY = [
     { id: 'memory',    title: 'MEMORY',   icon: '', desc: 'Flip and match all pairs.' },
-    { id: 'tictactoe', title: 'TIC TAC',  icon: '',  desc: 'Beat the computer... if you can.' },
-    { id: 'reaction',  title: 'REACTION', icon: '',  desc: 'Test your reflex speed.' },
-    { id: 'quiz',      title: 'QUIZ',     icon: '',  desc: '10 web dev questions.' },
-    { id: 'snake',     title: 'SNAKE',    icon: '',  desc: 'The classic snake game.' },
-    { id: 'scramble',  title: 'SCRAMBLE', icon: '',  desc: 'Unscramble the word fast.' },
-    { id: 'numguess',  title: 'GUESS',    icon: '',  desc: 'Guess the hidden number.' },
-    { id: 'hangman',   title: 'HANGMAN',  icon: '',  desc: 'Guess before the man hangs.' },
+    { id: 'tictactoe', title: 'TIC TAC',  icon: '', desc: 'Beat the computer... if you can.' },
+    { id: 'reaction',  title: 'REACTION', icon: '', desc: 'Test your reflex speed.' },
+    { id: 'quiz',      title: 'QUIZ',     icon: '', desc: '10 web dev questions.' },
+    { id: 'snake',     title: 'SNAKE',    icon: '', desc: 'The classic snake game.' },
+    { id: 'scramble',  title: 'SCRAMBLE', icon: '', desc: 'Unscramble the word fast.' },
+    { id: 'numguess',  title: 'GUESS',    icon: '', desc: 'Guess the hidden number.' },
+    { id: 'hangman',   title: 'HANGMAN',  icon: '', desc: 'Guess before the man hangs.' },
 ];
 document.addEventListener('DOMContentLoaded', () => {
     buildGameCards();
@@ -32,7 +35,7 @@ function buildGameCards() {
     `).join('');
 }
 
-const SCREENS = ['home', 'game', 'leaderboard', 'about', 'report', 'suggest'];
+const SCREENS = ['home', 'game', 'leaderboard', 'about', 'report', 'suggest', 'review'];
 
 window.sidebarNav = function(section) {
     SCREENS.forEach(s => {
@@ -52,6 +55,8 @@ window.sidebarNav = function(section) {
     if (section !== 'game') stopAllGames();
 
     closeSidebarMobile();
+    
+    window.scrollTo(0, 0);
 };
 
 window.backToHome = function() {
@@ -378,3 +383,80 @@ window.submitSuggestion = async function() {
 
 window.openLB  = () => sidebarNav('leaderboard');
 window.closeLB = () => sidebarNav('home');
+let reviewRating = 0;
+const ratingLabels = ['', 'Terrible', 'Bad', 'Okay', 'Good', 'Amazing!'];
+
+window.setReviewRating = function(rating) {
+    reviewRating = rating;
+    const stars = document.querySelectorAll('#review-stars .star-btn');
+    stars.forEach((star, i) => {
+        if (i < rating) {
+            star.style.opacity = '1';
+            star.style.color = '#00ff9d';
+        } else {
+            star.style.opacity = '0.4';
+            star.style.color = '';
+        }
+    });
+    document.getElementById('review-rating-text').textContent = ratingLabels[rating] + ' (' + rating + '/5)';
+};
+
+window.submitReview = async function() {
+    const rating = reviewRating;
+    const game = document.getElementById('review-game').value;
+    const text = document.getElementById('review-text').value.trim();
+    const anon = document.getElementById('review-anon').checked;
+    const status = document.getElementById('review-status');
+
+    if (rating === 0) {
+        status.style.color = '#f43f5e';
+        status.textContent = 'Please select a rating.';
+        return;
+    }
+
+    if (!text) {
+        status.style.color = '#f43f5e';
+        status.textContent = 'Please write a review.';
+        return;
+    }
+
+    const sender = (!anon && window._currentUser)
+        ? (window._currentUser.displayName || window._currentUser.email)
+        : 'Anonymous';
+
+    status.style.color = '#71717a';
+    status.textContent = 'Sending...';
+    document.querySelector('#screen-review .submit-btn').disabled = true;
+
+    try {
+        const starEmoji = ''.repeat(rating);
+        await sendToDiscord({
+            title: ' New Review',
+            color: rating >= 4 ? 0x00ff9d : (rating >= 3 ? 0xfbbf24 : 0xf43f5e),
+            fields: [
+                { name: 'Rating', value: starEmoji + ' (' + rating + '/5)', inline: true },
+                { name: 'From', value: sender, inline: true },
+                { name: 'Favorite Game', value: game || 'Not specified', inline: true },
+                { name: 'Review', value: text, inline: false },
+            ],
+            timestamp: new Date().toISOString()
+        });
+        status.style.color = '#00ff9d';
+        status.textContent = 'Review sent! Thanks for your feedback!';
+        
+        reviewRating = 0;
+        document.querySelectorAll('#review-stars .star-btn').forEach(star => {
+            star.style.opacity = '0.4';
+            star.style.color = '';
+        });
+        document.getElementById('review-rating-text').textContent = 'Select a rating';
+        document.getElementById('review-game').value = '';
+        document.getElementById('review-text').value = '';
+    } catch (e) {
+        console.error('Review webhook error:', e);
+        status.style.color = '#f43f5e';
+        status.textContent = 'Failed to send. Try again.';
+    } finally {
+        document.querySelector('#screen-review .submit-btn').disabled = false;
+    }
+};
