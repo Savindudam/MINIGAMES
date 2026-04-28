@@ -290,15 +290,15 @@ function renderLB() {
         </div>`;
 }
 
-
 async function sendToDiscord(embed) {
+    const body = new Blob([JSON.stringify({ embeds: [embed] })], { type: 'application/json' });
     const res = await fetch(WEBHOOK_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ embeds: [embed] })
+        body: body
     });
     if (!res.ok) throw new Error(`Webhook failed: ${res.status}`);
 }
+
 
 window.submitReport = async function() {
     const game  = document.getElementById('report-game').value;
@@ -314,7 +314,7 @@ window.submitReport = async function() {
 
     status.style.color = '#71717a';
     status.textContent = 'Sending...';
-    document.querySelector('#screen-report .submit-btn').disabled = true;
+    document.querySelector('#screen-report .form-submit-btn').disabled = true;
 
     try {
         await sendToDiscord({
@@ -335,7 +335,7 @@ window.submitReport = async function() {
         status.style.color = '#f43f5e';
         status.textContent = ' Failed to send. Try again.';
     } finally {
-        document.querySelector('#screen-report .submit-btn').disabled = false;
+        document.querySelector('#screen-report .form-submit-btn').disabled = false;
     }
 };
 
@@ -353,7 +353,7 @@ window.submitSuggestion = async function() {
 
     status.style.color = '#71717a';
     status.textContent = 'Sending...';
-    document.querySelector('#screen-suggest .submit-btn').disabled = true;
+    document.querySelector('#screen-suggest .form-submit-btn').disabled = true;
 
     try {
         await sendToDiscord({
@@ -375,7 +375,7 @@ window.submitSuggestion = async function() {
         status.style.color = '#f43f5e';
         status.textContent = '❌ Failed to send. Try again.';
     } finally {
-        document.querySelector('#screen-suggest .submit-btn').disabled = false;
+        document.querySelector('#screen-suggest .form-submit-btn').disabled = false;
     }
 };
 
@@ -424,7 +424,7 @@ window.submitReview = async function() {
 
     status.style.color = '#71717a';
     status.textContent = 'Sending...';
-    document.querySelector('#screen-review .submit-btn').disabled = true;
+    document.querySelector('#screen-review .form-submit-btn').disabled = true;
 
     try {
         const starEmoji = ''.repeat(rating);
@@ -455,6 +455,6 @@ window.submitReview = async function() {
         status.style.color = '#f43f5e';
         status.textContent = 'Failed to send. Try again.';
     } finally {
-        document.querySelector('#screen-review .submit-btn').disabled = false;
+        document.querySelector('#screen-review .form-submit-btn').disabled = false;
     }
 };
