@@ -4,6 +4,12 @@ Mini Arcade V1 - this is my first attempt at building a browser-based arcade wit
 
 ---
 
+# IMPORTANT NOTICE 
+
+Before playing any games just create an account or else your progress will be lost.
+
+---
+
 ## What This Project Is All About
 I built Mini Arcade V1 as a complete, ready-to-play web experience that combines entertainment with practical web development techniques. It’s designed to be:
 
@@ -64,6 +70,21 @@ new games are :
 - The theme button is happening to have a bug I will fix it on the update 1.3
 - The problems and bugs in the project was corrected now everything works fine working on the version 1.3 also.
 - There was so many errors in the index.html so i had to use the original formation of files i had to upload as the normal formation it was likely on.
+
+---
+
+## Version 1.3 update 
+- Guess what I updated the site again and now these features work much better than the last time.
+  
+  1. Leaderboard logics are resetted
+  2. Ability to send me bug reports and new game suggestions are added 
+  3. And a small page about me is added there umm dont worry its just a normal update hehe.
+  4. The database authentication logic was also recreated since it had much time 
+  5. And I lost my sense of UI designing and now it should look like crap I think you guys wont blame abt it much.
+  6. So since you guys can reach me from the site tell me what to add and what to update in the site.
+
+And this was the buggiest update I had ever did to this project. Since it was like when i created a new element and fixed something else just broke.So I hope you guys enjoy the site.
+
 
 ---
 
