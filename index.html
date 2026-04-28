@@ -9,25 +9,54 @@
     <link rel="stylesheet" href="assets/css/style.css">
 
 </head>
-<body class="bg-zinc-950 text-white min-h-screen">
+<body class="bg-zinc-950 text-white min-h-screen flex">
 
-     <nav class="bg-black border-b-4 border-[#00ff9d] py-4 px-8 flex items-center justify-between sticky top-0 z-50">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-[#00ff9d] text-black rounded-full flex items-center justify-center text-2xl"></div>
-            <h1 class="text-3xl arcade-header tracking-widest">MINI ARCADE</h1>
+    <aside id="sidebar" class="sidebar">
+ 
+        <!-- Logo -->
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-icon"></div>
+            <span class="sidebar-logo-text">MINI<br>ARCADE</span>
         </div>
-
-        <div class="flex items-center gap-8">
-            <button id="mute-btn" onclick="toggleMute()" class="text-xs font-bold hover:text-[#00ff9d] transition tracking-widest" title="Toggle sound">🔊</button>
-            <div id="nav-user-pill" class="hidden items-center gap-3 bg-zinc-900 px-4 py-2 rounded-2xl border border-[#00ff9d]/30">
-                <div class="w-2 h-2 rounded-full bg-[#00ff9d] animate-pulse"></div>
-                <span id="nav-username" class="text-[0.6rem] font-bold tracking-tighter">GUEST</span>
+ 
+        <!-- Nav links -->
+        <nav class="sidebar-nav">
+            <button class="sidebar-btn active" id="nav-home" onclick="sidebarNav('home')">
+                <span class="sidebar-icon"></span>
+                <span class="sidebar-label">HOME</span>
+            </button>
+            <button class="sidebar-btn" id="nav-leaderboard" onclick="sidebarNav('leaderboard')">
+                <span class="sidebar-icon"></span>
+                <span class="sidebar-label">LEADERBOARD</span>
+            </button>
+            <button class="sidebar-btn" id="nav-about" onclick="sidebarNav('about')">
+                <span class="sidebar-icon"></span>
+                <span class="sidebar-label">ABOUT</span>
+            </button>
+            <button class="sidebar-btn" id="nav-report" onclick="sidebarNav('report')">
+                <span class="sidebar-icon"></span>
+                <span class="sidebar-label">REPORT BUG</span>
+            </button>
+            <button class="sidebar-btn" id="nav-suggest" onclick="sidebarNav('suggest')">
+                <span class="sidebar-icon"></span>
+                <span class="sidebar-label">SUGGEST</span>
+            </button>
+        </nav>
+        <div class="sidebar-footer">
+            <div id="nav-user-pill" class="sidebar-user-pill hidden">
+                <div class="sidebar-user-dot"></div>
+                <span id="nav-username" class="sidebar-label">GUEST</span>
             </div>
-            <button id="auth-btn" onclick="showAuthModal('login')" class="text-xs font-bold hover:text-[#00ff9d] transition tracking-widest">
-                <span class="text-[#00ff9d]">▼</span> LOGIN
+            <button id="mute-btn" onclick="toggleMute()" class="sidebar-btn" title="Toggle sound">
+                <span class="sidebar-icon">🔊</span>
+                <span class="sidebar-label">SOUND</span>
+            </button>
+            <button id="auth-btn" onclick="showAuthModal('login')" class="sidebar-btn sidebar-btn-auth">
+                <span class="sidebar-icon">▶</span>
+                <span id="auth-btn-label" class="sidebar-label">LOGIN</span>
             </button>
         </div>
-    </nav>
+    </aside>
     <div id="screen-home" class="max-w-6xl mx-auto px-8 py-16">
         <div class="mb-16">
             <h2 class="text-4xl font-bold mb-4">WELCOME TO GAMES HUB , <span id="player-name" class="text-[#00ff9d]">GUEST</span></h2>
