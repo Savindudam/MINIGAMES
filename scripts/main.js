@@ -287,7 +287,6 @@ function renderLB() {
         </div>`;
 }
 
-const WEBHOOK_URL = 'https://discord.com/api/webhooks/1498357537882374385/z1zIAOlOjJI36RfGm1z9IXnAMgEjlK-VKiCM2xLgAyzPPyq4p0O-js-hDKLqZ17zJmY3';
 
 async function sendToDiscord(embed) {
     const res = await fetch(WEBHOOK_URL, {
