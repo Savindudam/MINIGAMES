@@ -22,27 +22,27 @@
         <!-- Nav links -->
         <nav class="sidebar-nav">
             <button class="sidebar-btn active" id="nav-home" onclick="sidebarNav('home')">
-                <span class="sidebar-icon">🏠</span>
+                <span class="sidebar-icon">&gt;</span>
                 <span class="sidebar-label">HOME</span>
             </button>
             <button class="sidebar-btn" id="nav-leaderboard" onclick="sidebarNav('leaderboard')">
-                <span class="sidebar-icon">🏆</span>
+                <span class="sidebar-icon">&gt;</span>
                 <span class="sidebar-label">LEADERBOARD</span>
             </button>
             <button class="sidebar-btn" id="nav-about" onclick="sidebarNav('about')">
-                <span class="sidebar-icon">👤</span>
+                <span class="sidebar-icon">&gt;</span>
                 <span class="sidebar-label">ABOUT</span>
             </button>
             <button class="sidebar-btn" id="nav-report" onclick="sidebarNav('report')">
-                <span class="sidebar-icon">🐛</span>
+                <span class="sidebar-icon">&gt;</span>
                 <span class="sidebar-label">REPORT BUG</span>
             </button>
             <button class="sidebar-btn" id="nav-suggest" onclick="sidebarNav('suggest')">
-                <span class="sidebar-icon">💡</span>
+                <span class="sidebar-icon">&gt;</span>
                 <span class="sidebar-label">SUGGEST</span>
             </button>
             <button class="sidebar-btn" id="nav-review" onclick="sidebarNav('review')">
-                <span class="sidebar-icon">⭐</span>
+                <span class="sidebar-icon">&gt;</span>
                 <span class="sidebar-label">REVIEW</span>
             </button>
         </nav>
@@ -52,7 +52,7 @@
                 <span id="nav-username" class="sidebar-label">GUEST</span>
             </div>
             <button id="mute-btn" onclick="toggleMute()" class="sidebar-btn" title="Toggle sound">
-                <span class="sidebar-icon">🔊</span>
+                <span class="sidebar-icon">S</span>
                 <span class="sidebar-label">SOUND</span>
             </button>
             <button id="auth-btn" onclick="showAuthModal('login')" class="sidebar-btn sidebar-btn-auth">
@@ -81,46 +81,7 @@
             </div>
 
             <div id="game-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div onclick="startGame('memory')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition">🧠</div>
-                    <h3 class="text-lg font-bold mb-2">MEMORY</h3>
-                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Connect all same type pics.</p>
-                </div>
-                <div onclick="startGame('tictactoe')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition">❌</div>
-                    <h3 class="text-lg font-bold mb-2">TIC TAC</h3>
-                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">You will never win against my computer.</p>
-                </div>
-                <div onclick="startGame('reaction')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition">⚡</div>
-                    <h3 class="text-lg font-bold mb-2">REACTION</h3>
-                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Test your speed reflexes.</p>
-                </div>
-                <div onclick="startGame('quiz')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition">❓</div>
-                    <h3 class="text-lg font-bold mb-2">QUIZ</h3>
-                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">10 Questions from web developing.</p>
-                </div>
-                <div onclick="startGame('snake')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition">🐍</div>
-                    <h3 class="text-lg font-bold mb-2">SNAKE</h3>
-                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">The well known snake game.</p>
-                </div>
-                <div onclick="startGame('scramble')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition">🔤</div>
-                    <h3 class="text-lg font-bold mb-2">SCRAMBLE</h3>
-                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Fix the word as soon as possible.</p>
-                </div>
-                <div onclick="startGame('numguess')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition">🔢</div>
-                    <h3 class="text-lg font-bold mb-2">GUESS</h3>
-                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Guess the number.</p>
-                </div>
-                <div onclick="startGame('hangman')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition">🪢</div>
-                    <h3 class="text-lg font-bold mb-2">HANGMAN</h3>
-                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Guess the word before the man is hanged.</p>
-                </div>
+                <!-- Game cards will be generated by JS -->
             </div>
 
             <div class="mt-20 flex justify-center">
@@ -311,26 +272,26 @@
             <button onclick="hideAuthModal()" class="mt-4 w-full py-3 text-xs text-zinc-500 hover:text-white transition">CANCEL</button>
         </div>
     </div>
-<div id="screen-leaderboard" class="hidden" style="margin-left:var(--sidebar-w)">
+<div id="screen-leaderboard" class="screen hidden">
         <!-- Sticky top bar: tabs + game pills -->
         <div class="lb-topbar">
             <div class="lb-topbar-inner">
                 <!-- Left: Global / My Scores tabs -->
                 <div class="lb-tabs">
-                    <button id="lb-tab-global" onclick="switchLBTab('global')" class="lb-tab active">🌍 GLOBAL</button>
-                    <button id="lb-tab-mine"   onclick="switchLBTab('mine')"   class="lb-tab">👤 MY SCORES</button>
+                    <button id="lb-tab-global" onclick="switchLBTab('global')" class="lb-tab active">* GLOBAL</button>
+                    <button id="lb-tab-mine"   onclick="switchLBTab('mine')"   class="lb-tab">* MY SCORES</button>
                 </div>
                 <!-- Right: scrollable game pills -->
                 <div class="lb-game-pills">
-                    <button onclick="selectLBGame('global')"    id="lbg-global"    class="lb-game-btn active-pill">🌐 GLOBAL</button>
-                    <button onclick="selectLBGame('memory')"    id="lbg-memory"    class="lb-game-btn">🧠 MEMORY</button>
-                    <button onclick="selectLBGame('tictactoe')" id="lbg-tictactoe" class="lb-game-btn">✖️ TIC TAC</button>
-                    <button onclick="selectLBGame('reaction')"  id="lbg-reaction"  class="lb-game-btn">⚡ REACTION</button>
-                    <button onclick="selectLBGame('quiz')"      id="lbg-quiz"      class="lb-game-btn">❓ QUIZ</button>
-                    <button onclick="selectLBGame('snake')"     id="lbg-snake"     class="lb-game-btn">🐍 SNAKE</button>
-                    <button onclick="selectLBGame('scramble')"  id="lbg-scramble"  class="lb-game-btn">🔤 SCRAMBLE</button>
-                    <button onclick="selectLBGame('numguess')"  id="lbg-numguess"  class="lb-game-btn">🔢 NUMGUESS</button>
-                    <button onclick="selectLBGame('hangman')"   id="lbg-hangman"   class="lb-game-btn">🪢 HANGMAN</button>
+                    <button onclick="selectLBGame('global')"    id="lbg-global"    class="lb-game-btn active-pill">* GLOBAL</button>
+                    <button onclick="selectLBGame('memory')"    id="lbg-memory"    class="lb-game-btn">* MEMORY</button>
+                    <button onclick="selectLBGame('tictactoe')" id="lbg-tictactoe" class="lb-game-btn">* TIC TAC</button>
+                    <button onclick="selectLBGame('reaction')"  id="lbg-reaction"  class="lb-game-btn">* REACTION</button>
+                    <button onclick="selectLBGame('quiz')"      id="lbg-quiz"      class="lb-game-btn">* QUIZ</button>
+                    <button onclick="selectLBGame('snake')"     id="lbg-snake"     class="lb-game-btn">* SNAKE</button>
+                    <button onclick="selectLBGame('scramble')"  id="lbg-scramble"  class="lb-game-btn">* SCRAMBLE</button>
+                    <button onclick="selectLBGame('numguess')"  id="lbg-numguess"  class="lb-game-btn">* NUMGUESS</button>
+                    <button onclick="selectLBGame('hangman')"   id="lbg-hangman"   class="lb-game-btn">* HANGMAN</button>
                 </div>
             </div>
         </div>
@@ -357,12 +318,12 @@
 
 
 
-<div id="screen-about" class="hidden" style="margin-left:var(--sidebar-w)">
+<div id="screen-about" class="screen hidden">
     <div class="max-w-2xl mx-auto px-8 py-16">
         <h2 class="text-3xl font-bold mb-12">ABOUT</h2>
 
         <div class="about-profile-card mb-8">
-            <div class="about-avatar-big">👾</div>
+            <div class="about-avatar-big">SD</div>
             <div class="about-profile-info">
                 <div class="about-name">SAVINDU DAMSARA</div>
                 <div class="about-nick">aka <span style="color:var(--neon)">DREAMXHAVA</span></div>
@@ -372,11 +333,11 @@
         <div class="about-info-grid mb-8">
             <div class="about-info-row">
                 <span class="about-info-label">AGE</span>
-                <span class="about-info-val">—</span>
+                <span class="about-info-val">-</span>
             </div>
             <div class="about-info-row">
                 <span class="about-info-label">COUNTRY</span>
-                <span class="about-info-val">🇱🇰 SRI LANKA</span>
+                <span class="about-info-val">SRI LANKA</span>
             </div>
             <div class="about-info-row">
                 <span class="about-info-label">GITHUB</span>
@@ -395,7 +356,7 @@
     </div>
 </div>
 
-<div id="screen-report" class="hidden" style="margin-left:var(--sidebar-w)">
+<div id="screen-report" class="screen hidden">
     <div class="max-w-xl mx-auto px-8 py-16">
         <h2 class="text-3xl font-bold mb-2">REPORT BUG</h2>
         <p class="text-zinc-500 mb-10" style="font-size:0.5rem;letter-spacing:0.08em">Found something broken? Let me know.</p>
@@ -429,7 +390,7 @@
     </div>
 </div>
 
-<div id="screen-suggest" class="hidden" style="margin-left:var(--sidebar-w)">
+<div id="screen-suggest" class="screen hidden">
     <div class="max-w-xl mx-auto px-8 py-16">
         <h2 class="text-3xl font-bold mb-2">SUGGEST A GAME</h2>
         <p class="text-zinc-500 mb-10" style="font-size:0.5rem;letter-spacing:0.08em">Got an idea? I might actually build it.</p>
@@ -452,7 +413,7 @@
     </div>
 </div>
 
-<div id="screen-review" class="hidden" style="margin-left:var(--sidebar-w)">
+<div id="screen-review" class="screen hidden">
     <div class="max-w-xl mx-auto px-8 py-16">
         <h2 class="text-3xl font-bold mb-2">LEAVE A REVIEW</h2>
         <p class="text-zinc-500 mb-10" style="font-size:0.5rem;letter-spacing:0.08em">Let me know what you think of Mini Arcade!</p>
