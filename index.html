@@ -22,24 +22,28 @@
         <!-- Nav links -->
         <nav class="sidebar-nav">
             <button class="sidebar-btn active" id="nav-home" onclick="sidebarNav('home')">
-                <span class="sidebar-icon"></span>
+                <span class="sidebar-icon">🏠</span>
                 <span class="sidebar-label">HOME</span>
             </button>
             <button class="sidebar-btn" id="nav-leaderboard" onclick="sidebarNav('leaderboard')">
-                <span class="sidebar-icon"></span>
+                <span class="sidebar-icon">🏆</span>
                 <span class="sidebar-label">LEADERBOARD</span>
             </button>
             <button class="sidebar-btn" id="nav-about" onclick="sidebarNav('about')">
-                <span class="sidebar-icon"></span>
+                <span class="sidebar-icon">👤</span>
                 <span class="sidebar-label">ABOUT</span>
             </button>
             <button class="sidebar-btn" id="nav-report" onclick="sidebarNav('report')">
-                <span class="sidebar-icon"></span>
+                <span class="sidebar-icon">🐛</span>
                 <span class="sidebar-label">REPORT BUG</span>
             </button>
             <button class="sidebar-btn" id="nav-suggest" onclick="sidebarNav('suggest')">
-                <span class="sidebar-icon"></span>
+                <span class="sidebar-icon">💡</span>
                 <span class="sidebar-label">SUGGEST</span>
+            </button>
+            <button class="sidebar-btn" id="nav-review" onclick="sidebarNav('review')">
+                <span class="sidebar-icon">⭐</span>
+                <span class="sidebar-label">REVIEW</span>
             </button>
         </nav>
         <div class="sidebar-footer">
@@ -57,62 +61,76 @@
             </button>
         </div>
     </aside>
-    <div id="screen-home" class="max-w-6xl mx-auto px-8 py-16">
-        <div class="mb-16">
-            <h2 class="text-4xl font-bold mb-4">WELCOME TO GAMES HUB , <span id="player-name" class="text-[#00ff9d]">GUEST</span></h2>
-            <p class="text-zinc-500 text-xs tracking-widest">SELECT A GAME TO PLAY</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div onclick="startGame('memory')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                <div class="text-5xl mb-6 group-hover:scale-110 transition"></div>
-                <h3 class="text-lg font-bold mb-2">MEMORY</h3>
-                <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Connect all same type pics.</p>
-            </div>
-            <div onclick="startGame('tictactoe')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                <div class="text-5xl mb-6 group-hover:scale-110 transition"></div>
-                <h3 class="text-lg font-bold mb-2">TIC TAC</h3>
-                <p class="text-zinc-500 text-[0.6rem] leading-relaxed">You will never win against my computer.</p>
-            </div>
-            <div onclick="startGame('reaction')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                <div class="text-5xl mb-6 group-hover:scale-110 transition"></div>
-                <h3 class="text-lg font-bold mb-2">REACTION</h3>
-                <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Test your speed reflexes.</p>
-            </div>
-            <div onclick="startGame('quiz')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                <div class="text-5xl mb-6 group-hover:scale-110 transition"></div>
-                <h3 class="text-lg font-bold mb-2">QUIZ</h3>
-                <p class="text-zinc-500 text-[0.6rem] leading-relaxed">10 Questions from web devoloping.</p>
-            </div>
-            <div onclick="startGame('snake')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                <div class="text-5xl mb-6 group-hover:scale-110 transition"></div>
-                <h3 class="text-lg font-bold mb-2">SNAKE</h3>
-                <p class="text-zinc-500 text-[0.6rem] leading-relaxed">The well known snake game.</p>
-            </div>
-            <div onclick="startGame('scramble')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                <div class="text-5xl mb-6 group-hover:scale-110 transition"></div>
-                <h3 class="text-lg font-bold mb-2">SCRAMBLE</h3>
-                <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Fix the word as soon as possible.</p>
-            </div>
-            <div onclick="startGame('numguess')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                <div class="text-5xl mb-6 group-hover:scale-110 transition"></div>
-                <h3 class="text-lg font-bold mb-2">GUESS</h3>
-                <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Guess the number.</p>
-            </div>
-            <div onclick="startGame('hangman')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                <div class="text-5xl mb-6 group-hover:scale-110 transition"></div>
-                <h3 class="text-lg font-bold mb-2">HANGMAN</h3>
-                <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Guess the word before the man is hanged.</p>
-            </div>
-        </div>
-
-        <div class="mt-20 flex justify-center">
-            <button onclick="openLB()" class="px-12 py-5 bg-zinc-900 border-2 border-[#00ff9d] text-[#00ff9d] rounded-full font-bold text-xs tracking-[0.3em] hover:bg-[#00ff9d] hover:text-black transition shadow-[0_0_20px_rgba(0,255,157,0.2)]">
-                VIEW LEADERBOARD
-            </button>
-        </div>
+    
+    <!-- Sidebar overlay for mobile -->
+    <div id="sidebar-overlay" class="sidebar-overlay hidden" onclick="closeSidebarMobile()"></div>
+    
+    <!-- Mobile top bar -->
+    <div class="mobile-topbar">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+        <span class="mobile-title">MINI ARCADE</span>
+        <div style="width:40px"></div>
     </div>
- <div id="screen-game" class="hidden max-w-6xl mx-auto px-8 py-12">
+    
+    <!-- Main content wrapper -->
+    <div class="main-content">
+        <div id="screen-home" class="screen max-w-6xl mx-auto px-8 py-16">
+            <div class="mb-16">
+                <h2 class="text-4xl font-bold mb-4">WELCOME TO GAMES HUB, <span id="player-name" class="text-[#00ff9d]">GUEST</span></h2>
+                <p class="text-zinc-500 text-xs tracking-widest">SELECT A GAME TO PLAY</p>
+            </div>
+
+            <div id="game-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div onclick="startGame('memory')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
+                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition">🧠</div>
+                    <h3 class="text-lg font-bold mb-2">MEMORY</h3>
+                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Connect all same type pics.</p>
+                </div>
+                <div onclick="startGame('tictactoe')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
+                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition">❌</div>
+                    <h3 class="text-lg font-bold mb-2">TIC TAC</h3>
+                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">You will never win against my computer.</p>
+                </div>
+                <div onclick="startGame('reaction')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
+                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition">⚡</div>
+                    <h3 class="text-lg font-bold mb-2">REACTION</h3>
+                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Test your speed reflexes.</p>
+                </div>
+                <div onclick="startGame('quiz')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
+                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition">❓</div>
+                    <h3 class="text-lg font-bold mb-2">QUIZ</h3>
+                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">10 Questions from web developing.</p>
+                </div>
+                <div onclick="startGame('snake')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
+                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition">🐍</div>
+                    <h3 class="text-lg font-bold mb-2">SNAKE</h3>
+                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">The well known snake game.</p>
+                </div>
+                <div onclick="startGame('scramble')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
+                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition">🔤</div>
+                    <h3 class="text-lg font-bold mb-2">SCRAMBLE</h3>
+                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Fix the word as soon as possible.</p>
+                </div>
+                <div onclick="startGame('numguess')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
+                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition">🔢</div>
+                    <h3 class="text-lg font-bold mb-2">GUESS</h3>
+                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Guess the number.</p>
+                </div>
+                <div onclick="startGame('hangman')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
+                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition">🪢</div>
+                    <h3 class="text-lg font-bold mb-2">HANGMAN</h3>
+                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Guess the word before the man is hanged.</p>
+                </div>
+            </div>
+
+            <div class="mt-20 flex justify-center">
+                <button onclick="openLB()" class="px-12 py-5 bg-zinc-900 border-2 border-[#00ff9d] text-[#00ff9d] rounded-full font-bold text-xs tracking-[0.3em] hover:bg-[#00ff9d] hover:text-black transition shadow-[0_0_20px_rgba(0,255,157,0.2)]">
+                    VIEW LEADERBOARD
+                </button>
+            </div>
+        </div>
+        
+        <div id="screen-game" class="screen hidden max-w-6xl mx-auto px-8 py-12">
         <div class="flex items-center justify-between mb-12">
             <button onclick="backToHome()" class="text-xs font-bold text-zinc-500 hover:text-white transition tracking-widest">← BACK TO MENU</button>
             <h2 id="game-title" class="text-2xl font-bold tracking-widest text-[#00ff9d]">GAME</h2>
@@ -243,6 +261,9 @@
                 <button onclick="initHangman()" class="px-12 py-4 bg-[#00ff9d] text-black rounded-3xl font-bold text-sm">NEXT WORD →</button>
             </div>
         </div>
+    </div>
+    
+    <!-- End main-content wrapper -->
     </div>
 
 <div id="auth-modal" class="hidden fixed inset-0 bg-black/85 items-center justify-center z-[200]" style="display:none"
@@ -428,6 +449,55 @@
         </div>
         <button onclick="submitSuggestion()" class="submit-btn">SEND SUGGESTION</button>
         <p id="suggest-status" class="mt-4 text-center" style="font-size:0.45rem;min-height:1rem"></p>
+    </div>
+</div>
+
+<div id="screen-review" class="hidden" style="margin-left:var(--sidebar-w)">
+    <div class="max-w-xl mx-auto px-8 py-16">
+        <h2 class="text-3xl font-bold mb-2">LEAVE A REVIEW</h2>
+        <p class="text-zinc-500 mb-10" style="font-size:0.5rem;letter-spacing:0.08em">Let me know what you think of Mini Arcade!</p>
+        
+        <div class="form-group">
+            <label class="form-label">RATING</label>
+            <div id="review-stars" class="flex gap-3 mb-2">
+                <button onclick="setReviewRating(1)" class="star-btn text-3xl opacity-40 hover:opacity-100 transition">&#9733;</button>
+                <button onclick="setReviewRating(2)" class="star-btn text-3xl opacity-40 hover:opacity-100 transition">&#9733;</button>
+                <button onclick="setReviewRating(3)" class="star-btn text-3xl opacity-40 hover:opacity-100 transition">&#9733;</button>
+                <button onclick="setReviewRating(4)" class="star-btn text-3xl opacity-40 hover:opacity-100 transition">&#9733;</button>
+                <button onclick="setReviewRating(5)" class="star-btn text-3xl opacity-40 hover:opacity-100 transition">&#9733;</button>
+            </div>
+            <p id="review-rating-text" class="text-xs text-zinc-500">Select a rating</p>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">FAVORITE GAME (OPTIONAL)</label>
+            <select id="review-game" class="form-select">
+                <option value="">-- Select a game --</option>
+                <option value="memory">Memory</option>
+                <option value="tictactoe">Tic Tac</option>
+                <option value="reaction">Reaction</option>
+                <option value="quiz">Quiz</option>
+                <option value="snake">Snake</option>
+                <option value="scramble">Scramble</option>
+                <option value="numguess">Num Guess</option>
+                <option value="hangman">Hangman</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">YOUR REVIEW</label>
+            <textarea id="review-text" class="form-textarea" placeholder="What do you like? What could be better?"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label class="anon-label">
+                <input type="checkbox" id="review-anon" class="anon-checkbox">
+                <span style="font-size:0.45rem;color:var(--text-muted);letter-spacing:0.08em">SEND ANONYMOUSLY</span>
+            </label>
+        </div>
+        
+        <button onclick="submitReview()" class="submit-btn">SUBMIT REVIEW</button>
+        <p id="review-status" class="mt-4 text-center" style="font-size:0.45rem;min-height:1rem"></p>
     </div>
 </div>
 

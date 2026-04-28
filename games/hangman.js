@@ -46,7 +46,7 @@ window.guessHangman = function(l) {
         hmLives--;
         document.getElementById('hm-lives').textContent = hmLives;
         const parts = ['head','body','larm','rarm','lleg','rleg'];
-        const idx = 5 - hmLives;
+        const idx = 6 - hmLives - 1;
         if (parts[idx]) document.getElementById('hm-' + parts[idx]).classList.remove('hidden');
         window.playSound('click');
     } else window.playSound('match');
