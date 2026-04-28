@@ -174,43 +174,82 @@ window.fbSaveScore = async function(game, score) {
     }
 };
 
-async function fetchTopScoresForGame(game, opts = {}) {
+async function fetchBestPerUserForGame(game) {
     try {
-        const filters = [where('game', '==', game)];
-        if (opts.uid) filters.push(where('uid', '==', opts.uid));
-        const q = query(collection(db, 'scores'), ...filters, limit(200));
+        const q = query(collection(db, 'scores'), where('game', '==', game), limit(500));
         const snap = await getDocs(q);
-        let rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-        if (!opts.uid) {
-            const bestByUser = new Map();
-            for (const r of rows) {
-                const prev = bestByUser.get(r.uid);
-                if (!prev || (r.score || 0) > (prev.score || 0)) bestByUser.set(r.uid, r);
-            }
-            rows = Array.from(bestByUser.values());
+        const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const bestByUser = new Map();
+        for (const r of rows) {
+            const prev = bestByUser.get(r.uid);
+            if (!prev || (r.score || 0) > (prev.score || 0)) bestByUser.set(r.uid, r);
         }
-
-        rows.sort((a, b) => (b.score || 0) - (a.score || 0));
-        return rows.slice(0, opts.uid ? 5 : 10);
+        const result = Array.from(bestByUser.values());
+        result.sort((a, b) => (b.score || 0) - (a.score || 0));
+        return result.slice(0, 10);
     } catch (e) {
         console.error(`Leaderboard fetch failed for ${game}:`, e);
         return [];
     }
 }
 
+async function fetchGlobalTotals() {
+    try {
+        const q = query(collection(db, 'scores'), limit(1000));
+        const snap = await getDocs(q);
+        const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const bestPerGamePerUser = {};
+        for (const r of rows) {
+            if (!bestPerGamePerUser[r.uid]) bestPerGamePerUser[r.uid] = { uid: r.uid, displayName: r.displayName, games: {} };
+            const prev = bestPerGamePerUser[r.uid].games[r.game] || 0;
+            if ((r.score || 0) > prev) bestPerGamePerUser[r.uid].games[r.game] = r.score || 0;
+        }
+        const totals = Object.values(bestPerGamePerUser).map(u => ({
+            uid: u.uid,
+            displayName: u.displayName,
+            score: Object.values(u.games).reduce((a, b) => a + b, 0),
+            gamesPlayed: Object.keys(u.games).length
+        }));
+        totals.sort((a, b) => b.score - a.score);
+        return totals.slice(0, 10);
+    } catch (e) {
+        console.error('Global leaderboard fetch failed:', e);
+        return [];
+    }
+}
+
 window.fbLoadLeaderboard = async function() {
-    const result = {};
-    await Promise.all(GAMES.map(async g => { result[g] = await fetchTopScoresForGame(g); }));
+    const result = { global: await fetchGlobalTotals() };
+    await Promise.all(GAMES.map(async g => { result[g] = await fetchBestPerUserForGame(g); }));
     return result;
 };
 
 window.fbLoadMyScores = async function() {
     const user = auth.currentUser;
     if (!user) return {};
-    const result = {};
-    await Promise.all(GAMES.map(async g => {
-        result[g] = await fetchTopScoresForGame(g, { uid: user.uid });
-    }));
-    return result;
+    try {
+        const q = query(collection(db, 'scores'), where('uid', '==', user.uid), limit(500));
+        const snap = await getDocs(q);
+        const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const result = {};
+        for (const g of GAMES) {
+            const gameRows = rows.filter(r => r.game === g);
+            gameRows.sort((a, b) => (b.score || 0) - (a.score || 0));
+            result[g] = gameRows.slice(0, 5);
+        }
+        const bestPerGame = {};
+        for (const r of rows) {
+            if (!bestPerGame[r.game] || (r.score || 0) > (bestPerGame[r.game].score || 0)) bestPerGame[r.game] = r;
+        }
+        result.global = [{
+            uid: user.uid,
+            displayName: user.displayName || user.email.split('@')[0],
+            score: Object.values(bestPerGame).reduce((a, r) => a + (r.score || 0), 0),
+            gamesPlayed: Object.keys(bestPerGame).length
+        }];
+        return result;
+    } catch (e) {
+        console.error('My scores fetch failed:', e);
+        return {};
+    }
 };

@@ -13,11 +13,13 @@
 
     <aside id="sidebar" class="sidebar">
  
+        <!-- Logo -->
         <div class="sidebar-logo">
             <div class="sidebar-logo-icon"></div>
             <span class="sidebar-logo-text">MINI<br>ARCADE</span>
         </div>
  
+        <!-- Nav links -->
         <nav class="sidebar-nav">
             <button class="sidebar-btn active" id="nav-home" onclick="sidebarNav('home')">
                 <span class="sidebar-icon"></span>
@@ -299,7 +301,8 @@
                 </div>
                 <!-- Right: scrollable game pills -->
                 <div class="lb-game-pills">
-                    <button onclick="selectLBGame('memory')"    id="lbg-memory"    class="lb-game-btn active-pill">🧠 MEMORY</button>
+                    <button onclick="selectLBGame('global')"    id="lbg-global"    class="lb-game-btn active-pill">🌐 GLOBAL</button>
+                    <button onclick="selectLBGame('memory')"    id="lbg-memory"    class="lb-game-btn">🧠 MEMORY</button>
                     <button onclick="selectLBGame('tictactoe')" id="lbg-tictactoe" class="lb-game-btn">✖️ TIC TAC</button>
                     <button onclick="selectLBGame('reaction')"  id="lbg-reaction"  class="lb-game-btn">⚡ REACTION</button>
                     <button onclick="selectLBGame('quiz')"      id="lbg-quiz"      class="lb-game-btn">❓ QUIZ</button>
@@ -332,6 +335,101 @@
 
 
 
+
+<div id="screen-about" class="hidden" style="margin-left:var(--sidebar-w)">
+    <div class="max-w-2xl mx-auto px-8 py-16">
+        <h2 class="text-3xl font-bold mb-12">ABOUT</h2>
+
+        <div class="about-profile-card mb-8">
+            <div class="about-avatar-big">👾</div>
+            <div class="about-profile-info">
+                <div class="about-name">SAVINDU DAMSARA</div>
+                <div class="about-nick">aka <span style="color:var(--neon)">DREAMXHAVA</span></div>
+            </div>
+        </div>
+
+        <div class="about-info-grid mb-8">
+            <div class="about-info-row">
+                <span class="about-info-label">AGE</span>
+                <span class="about-info-val">—</span>
+            </div>
+            <div class="about-info-row">
+                <span class="about-info-label">COUNTRY</span>
+                <span class="about-info-val">🇱🇰 SRI LANKA</span>
+            </div>
+            <div class="about-info-row">
+                <span class="about-info-label">GITHUB</span>
+                <a href="https://github.com/savindudam" target="_blank" class="about-info-link">savindudam</a>
+            </div>
+            <div class="about-info-row">
+                <span class="about-info-label">INSTAGRAM</span>
+                <a href="https://instagram.com/dreamxhava_2" target="_blank" class="about-info-link">@dreamxhava_2</a>
+            </div>
+        </div>
+
+        <div class="about-desc-card">
+            <p class="about-desc-text">Built this arcade as a personal project to practice web dev. All games are coded from scratch — no game engines, just vanilla JS and a lot of trial and error.</p>
+            <p class="about-desc-text" style="margin-top:1rem">If something is broken, hit Report Bug. If you have an idea, hit Suggest. I actually read them.</p>
+        </div>
+    </div>
+</div>
+
+<div id="screen-report" class="hidden" style="margin-left:var(--sidebar-w)">
+    <div class="max-w-xl mx-auto px-8 py-16">
+        <h2 class="text-3xl font-bold mb-2">REPORT BUG</h2>
+        <p class="text-zinc-500 mb-10" style="font-size:0.5rem;letter-spacing:0.08em">Found something broken? Let me know.</p>
+        <div class="form-group">
+            <label class="form-label">WHICH GAME?</label>
+            <select id="report-game" class="form-select">
+                <option value="general">General / UI</option>
+                <option value="memory">Memory</option>
+                <option value="tictactoe">Tic Tac</option>
+                <option value="reaction">Reaction</option>
+                <option value="quiz">Quiz</option>
+                <option value="snake">Snake</option>
+                <option value="scramble">Scramble</option>
+                <option value="numguess">Num Guess</option>
+                <option value="hangman">Hangman</option>
+                <option value="leaderboard">Leaderboard</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">DESCRIBE THE BUG</label>
+            <textarea id="report-desc" class="form-textarea" placeholder="What happened? What were you doing?"></textarea>
+        </div>
+        <div class="form-group">
+            <label class="anon-label">
+                <input type="checkbox" id="report-anon" class="anon-checkbox">
+                <span style="font-size:0.45rem;color:var(--text-muted);letter-spacing:0.08em">SEND ANONYMOUSLY</span>
+            </label>
+        </div>
+        <button onclick="submitReport()" class="submit-btn">SEND REPORT</button>
+        <p id="report-status" class="mt-4 text-center" style="font-size:0.45rem;min-height:1rem"></p>
+    </div>
+</div>
+
+<div id="screen-suggest" class="hidden" style="margin-left:var(--sidebar-w)">
+    <div class="max-w-xl mx-auto px-8 py-16">
+        <h2 class="text-3xl font-bold mb-2">SUGGEST A GAME</h2>
+        <p class="text-zinc-500 mb-10" style="font-size:0.5rem;letter-spacing:0.08em">Got an idea? I might actually build it.</p>
+        <div class="form-group">
+            <label class="form-label">GAME NAME / IDEA</label>
+            <input type="text" id="suggest-name" placeholder="e.g. Minesweeper, Tetris...">
+        </div>
+        <div class="form-group">
+            <label class="form-label">DETAILS (OPTIONAL)</label>
+            <textarea id="suggest-desc" class="form-textarea" placeholder="How should it work? Any special rules?"></textarea>
+        </div>
+        <div class="form-group">
+            <label class="anon-label">
+                <input type="checkbox" id="suggest-anon" class="anon-checkbox">
+                <span style="font-size:0.45rem;color:var(--text-muted);letter-spacing:0.08em">SEND ANONYMOUSLY</span>
+            </label>
+        </div>
+        <button onclick="submitSuggestion()" class="submit-btn">SEND SUGGESTION</button>
+        <p id="suggest-status" class="mt-4 text-center" style="font-size:0.45rem;min-height:1rem"></p>
+    </div>
+</div>
 
     <script src="scripts/main.js"></script>
     <script src="games/memory.js"></script>

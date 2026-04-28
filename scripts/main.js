@@ -4,17 +4,17 @@ let currentAuthTab = 'login';
 let lbData         = {};
 let lbMyData       = {};
 let lbTab          = 'global';
-let lbGame         = 'memory';
+let lbGame         = 'global';
 
 const GAME_REGISTRY = [
-    { id: 'memory',    title: 'MEMORY',   icon: '🧠', desc: 'Flip and match all pairs.' },
-    { id: 'tictactoe', title: 'TIC TAC',  icon: '✖️',  desc: 'Beat the computer... if you can.' },
-    { id: 'reaction',  title: 'REACTION', icon: '⚡',  desc: 'Test your reflex speed.' },
-    { id: 'quiz',      title: 'QUIZ',     icon: '❓',  desc: '10 web dev questions.' },
-    { id: 'snake',     title: 'SNAKE',    icon: '🐍',  desc: 'The classic snake game.' },
-    { id: 'scramble',  title: 'SCRAMBLE', icon: '🔤',  desc: 'Unscramble the word fast.' },
-    { id: 'numguess',  title: 'GUESS',    icon: '🔢',  desc: 'Guess the hidden number.' },
-    { id: 'hangman',   title: 'HANGMAN',  icon: '🪢',  desc: 'Guess before the man hangs.' },
+    { id: 'memory',    title: 'MEMORY',   icon: '', desc: 'Flip and match all pairs.' },
+    { id: 'tictactoe', title: 'TIC TAC',  icon: '',  desc: 'Beat the computer... if you can.' },
+    { id: 'reaction',  title: 'REACTION', icon: '',  desc: 'Test your reflex speed.' },
+    { id: 'quiz',      title: 'QUIZ',     icon: '',  desc: '10 web dev questions.' },
+    { id: 'snake',     title: 'SNAKE',    icon: '',  desc: 'The classic snake game.' },
+    { id: 'scramble',  title: 'SCRAMBLE', icon: '',  desc: 'Unscramble the word fast.' },
+    { id: 'numguess',  title: 'GUESS',    icon: '',  desc: 'Guess the hidden number.' },
+    { id: 'hangman',   title: 'HANGMAN',  icon: '',  desc: 'Guess before the man hangs.' },
 ];
 document.addEventListener('DOMContentLoaded', () => {
     buildGameCards();
@@ -265,15 +265,23 @@ function renderLB() {
         container.innerHTML = `<div class="text-center py-12 text-zinc-500 text-xs">NO SCORES YET</div>`;
         return;
     }
+    const medals = ['🥇','🥈','🥉'];
+    const isGlobal = lbGame === 'global';
     container.innerHTML = `
-        <div class="space-y-2">
+        <div class="space-y-3">
             ${data.map((d, i) => `
                 <div class="leaderboard-row flex items-center justify-between bg-zinc-800/50 p-4 rounded-2xl border border-zinc-800">
                     <div class="flex items-center gap-4">
-                        <span class="rank font-bold w-6">#${i + 1}</span>
-                        <span class="text-xs font-bold">${(d.displayName || 'PLAYER').toUpperCase()}</span>
+                        <span class="rank font-bold w-8 text-sm">${medals[i] || '#' + (i + 1)}</span>
+                        <div>
+                            <div class="text-xs font-bold">${(d.displayName || 'PLAYER').toUpperCase()}</div>
+                            ${isGlobal ? `<div style="font-size:0.4rem;color:var(--text-muted);margin-top:3px">${d.gamesPlayed || 0} GAMES PLAYED</div>` : ''}
+                        </div>
                     </div>
-                    <span style="color:var(--neon)" class="font-bold">${d.score}</span>
+                    <div class="text-right">
+                        <div style="color:var(--neon);font-size:0.9rem;font-weight:bold">${d.score.toLocaleString()}</div>
+                        <div style="font-size:0.4rem;color:var(--text-muted)">${isGlobal ? 'TOTAL PTS' : 'BEST SCORE'}</div>
+                    </div>
                 </div>
             `).join('')}
         </div>`;
@@ -317,12 +325,12 @@ window.submitReport = async function() {
             timestamp: new Date().toISOString()
         });
         status.style.color = '#00ff9d';
-        status.textContent = '✅ Report sent! Thanks.';
+        status.textContent = ' Report sent! Thanks.';
         document.getElementById('report-desc').value = '';
     } catch (e) {
         console.error('Webhook error:', e);
         status.style.color = '#f43f5e';
-        status.textContent = '❌ Failed to send. Try again.';
+        status.textContent = ' Failed to send. Try again.';
     } finally {
         document.querySelector('#screen-report .submit-btn').disabled = false;
     }
@@ -370,5 +378,3 @@ window.submitSuggestion = async function() {
 
 window.openLB  = () => sidebarNav('leaderboard');
 window.closeLB = () => sidebarNav('home');
-
-// add leaderboard to SCREENS list handled by sidebarNav
