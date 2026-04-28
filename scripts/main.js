@@ -240,24 +240,16 @@ async function loadLeaderboardScreen() {
 
 window.switchLBTab = function(t) {
     lbTab = t;
-    document.getElementById('lb-tab-global').classList.toggle('active', t === 'global');
-    document.getElementById('lb-tab-global').classList.toggle('text-zinc-400', t !== 'global');
-    document.getElementById('lb-tab-mine').classList.toggle('active', t === 'mine');
-    document.getElementById('lb-tab-mine').classList.toggle('text-zinc-400', t !== 'mine');
+    document.querySelectorAll('.lb-tab').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(t === 'global' ? 'lb-tab-global' : 'lb-tab-mine').classList.add('active');
     renderLB();
 };
 
 window.selectLBGame = function(g) {
     lbGame = g;
-    document.querySelectorAll('.lb-game-btn').forEach(btn => {
-        btn.classList.remove('bg-[#00ff9d]', 'text-black');
-        btn.classList.add('bg-zinc-800');
-    });
+    document.querySelectorAll('.lb-game-btn').forEach(btn => btn.classList.remove('active-pill'));
     const active = document.getElementById('lbg-' + g);
-    if (active) {
-        active.classList.add('bg-[#00ff9d]', 'text-black');
-        active.classList.remove('bg-zinc-800');
-    }
+    if (active) active.classList.add('active-pill');
     renderLB();
 };
 
@@ -378,3 +370,5 @@ window.submitSuggestion = async function() {
 
 window.openLB  = () => sidebarNav('leaderboard');
 window.closeLB = () => sidebarNav('home');
+
+// add leaderboard to SCREENS list handled by sidebarNav

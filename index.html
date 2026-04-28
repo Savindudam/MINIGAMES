@@ -13,13 +13,11 @@
 
     <aside id="sidebar" class="sidebar">
  
-        <!-- Logo -->
         <div class="sidebar-logo">
             <div class="sidebar-logo-icon"></div>
             <span class="sidebar-logo-text">MINI<br>ARCADE</span>
         </div>
  
-        <!-- Nav links -->
         <nav class="sidebar-nav">
             <button class="sidebar-btn active" id="nav-home" onclick="sidebarNav('home')">
                 <span class="sidebar-icon"></span>
@@ -290,27 +288,31 @@
             <button onclick="hideAuthModal()" class="mt-4 w-full py-3 text-xs text-zinc-500 hover:text-white transition">CANCEL</button>
         </div>
     </div>
-<div id="lb-modal" class="hidden fixed inset-0 bg-black/85 items-center justify-center z-[200]" style="display:none"
-         onclick="if(event.target.id==='lb-modal') closeLB()">
-        <div class="modal-anim bg-zinc-900 w-full max-w-xl mx-4 rounded-3xl p-8 border-2 border-[#00ff9d]/30 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold">LEADERBOARD</h2>
-                <button onclick="closeLB()" class="text-zinc-500 hover:text-white transition text-xs">✕ CLOSE</button>
+<div id="screen-leaderboard" class="hidden" style="margin-left:var(--sidebar-w)">
+        <!-- Sticky top bar: tabs + game pills -->
+        <div class="lb-topbar">
+            <div class="lb-topbar-inner">
+                <!-- Left: Global / My Scores tabs -->
+                <div class="lb-tabs">
+                    <button id="lb-tab-global" onclick="switchLBTab('global')" class="lb-tab active">🌍 GLOBAL</button>
+                    <button id="lb-tab-mine"   onclick="switchLBTab('mine')"   class="lb-tab">👤 MY SCORES</button>
+                </div>
+                <!-- Right: scrollable game pills -->
+                <div class="lb-game-pills">
+                    <button onclick="selectLBGame('memory')"    id="lbg-memory"    class="lb-game-btn active-pill">🧠 MEMORY</button>
+                    <button onclick="selectLBGame('tictactoe')" id="lbg-tictactoe" class="lb-game-btn">✖️ TIC TAC</button>
+                    <button onclick="selectLBGame('reaction')"  id="lbg-reaction"  class="lb-game-btn">⚡ REACTION</button>
+                    <button onclick="selectLBGame('quiz')"      id="lbg-quiz"      class="lb-game-btn">❓ QUIZ</button>
+                    <button onclick="selectLBGame('snake')"     id="lbg-snake"     class="lb-game-btn">🐍 SNAKE</button>
+                    <button onclick="selectLBGame('scramble')"  id="lbg-scramble"  class="lb-game-btn">🔤 SCRAMBLE</button>
+                    <button onclick="selectLBGame('numguess')"  id="lbg-numguess"  class="lb-game-btn">🔢 NUMGUESS</button>
+                    <button onclick="selectLBGame('hangman')"   id="lbg-hangman"   class="lb-game-btn">🪢 HANGMAN</button>
+                </div>
             </div>
-            <div class="flex mb-6 bg-zinc-800 rounded-2xl p-1 gap-1">
-                <button id="lb-tab-global" onclick="switchLBTab('global')" class="tab-btn active flex-1 py-3 rounded-xl text-xs font-bold transition">🌍 GLOBAL</button>
-                <button id="lb-tab-mine"   onclick="switchLBTab('mine')"   class="tab-btn flex-1 py-3 rounded-xl text-xs font-bold transition text-zinc-400">👤 MY SCORES</button>
-            </div>
-            <div class="flex gap-2 mb-6 flex-wrap">
-                <button onclick="selectLBGame('memory')"   id="lbg-memory"   class="lb-game-btn px-4 py-2 rounded-xl text-xs font-bold bg-[#00ff9d] text-black transition">MEMORY</button>
-                <button onclick="selectLBGame('tictactoe')"id="lbg-tictactoe"class="lb-game-btn px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 transition">TIC TAC</button>
-                <button onclick="selectLBGame('reaction')" id="lbg-reaction" class="lb-game-btn px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 transition">REACTION</button>
-                <button onclick="selectLBGame('quiz')"     id="lbg-quiz"     class="lb-game-btn px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 transition">QUIZ</button>
-                <button onclick="selectLBGame('snake')"    id="lbg-snake"    class="lb-game-btn px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 transition">SNAKE</button>
-                <button onclick="selectLBGame('scramble')" id="lbg-scramble" class="lb-game-btn px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 transition">SCRAMBLE</button>
-                <button onclick="selectLBGame('numguess')" id="lbg-numguess" class="lb-game-btn px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 transition">NUM GUESS</button>
-                <button onclick="selectLBGame('hangman')"  id="lbg-hangman"  class="lb-game-btn px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 transition">HANGMAN</button>
-            </div>
+        </div>
+        <!-- Scores list -->
+        <div class="max-w-2xl mx-auto px-8" style="padding-top:80px;padding-bottom:40px;">
+            <h2 class="text-3xl font-bold mb-8">LEADERBOARD</h2>
             <div id="lb-content">
                 <div class="text-center py-12 text-zinc-500 text-xs">Loading scores...</div>
             </div>
