@@ -11,17 +11,15 @@ const WEBHOOK_URL = 'https://discord.com/api/webhooks/1498357537882374385/z1zIAO
 
 const GAME_REGISTRY = [
     { id: 'memory',    title: 'MEMORY',   icon: '', desc: 'Flip and match all pairs.' },
-    { id: 'tictactoe', title: 'TIC TAC',  icon: '', desc: 'Beat the computer... if you can.' },
+    { id: 'tictactoe', title: 'TIC TAC',  icon: '',  desc: 'Beat the computer... if you can.' },
     { id: 'reaction',  title: 'REACTION', icon: '', desc: 'Test your reflex speed.' },
-    { id: 'quiz',      title: 'QUIZ',     icon: '', desc: '10 web dev questions.' },
+    { id: 'quiz',      title: 'QUIZ',     icon: '',  desc: '10 web dev questions.' },
     { id: 'snake',     title: 'SNAKE',    icon: '', desc: 'The classic snake game.' },
     { id: 'scramble',  title: 'SCRAMBLE', icon: '', desc: 'Unscramble the word fast.' },
     { id: 'numguess',  title: 'GUESS',    icon: '', desc: 'Guess the hidden number.' },
     { id: 'hangman',   title: 'HANGMAN',  icon: '', desc: 'Guess before the man hangs.' },
 ];
-document.addEventListener('DOMContentLoaded', () => {
-    buildGameCards();
-});
+
 
 function buildGameCards() {
     const grid = document.getElementById('game-cards-grid');

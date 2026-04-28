@@ -1,4 +1,5 @@
 :root {
+    font-size: 18px;
     --neon: #00ff9d;
     --neon-dim: rgba(0, 255, 157, 0.15);
     --neon-glow: 0 0 12px rgba(0, 255, 157, 0.5);
@@ -495,15 +496,19 @@ select {
 }
 
 .about-avatar-big {
-    font-size: 4rem;
+    font-size: 1.4rem;
+    font-family: 'Press Start 2P', system-ui;
     width: 100px;
     height: 100px;
     background: var(--neon-dim);
+    border: 2px solid var(--sidebar-border);
     border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    color: var(--neon);
+    letter-spacing: 0.05em;
 }
 
 .about-profile-info {
@@ -665,5 +670,266 @@ select {
     #screen-suggest,
     #screen-review {
         margin-left: 0 !important;
+    }
+}
+
+.form-screen-wrap {
+    display: flex;
+    min-height: 100vh;
+    align-items: flex-start;
+    padding: 72px 48px 60px;
+    gap: 64px;
+}
+
+.form-screen-header {
+    width: 260px;
+    flex-shrink: 0;
+    padding-top: 8px;
+    position: sticky;
+    top: 72px;
+}
+
+.form-screen-tag {
+    display: inline-block;
+    font-family: 'Press Start 2P', system-ui;
+    font-size: 0.4rem;
+    letter-spacing: 0.15em;
+    color: var(--neon);
+    background: var(--neon-dim);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    margin-bottom: 20px;
+}
+
+.form-screen-title {
+    font-family: 'Press Start 2P', system-ui;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--text);
+    margin-bottom: 16px;
+}
+
+.form-screen-sub {
+    font-family: 'Press Start 2P', system-ui;
+    font-size: 0.42rem;
+    line-height: 2;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+}
+
+.form-card {
+    flex: 1;
+    max-width: 520px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 36px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.form-field-label {
+    font-family: 'Press Start 2P', system-ui;
+    font-size: 0.42rem;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-field-optional {
+    font-size: 0.35rem;
+    color: var(--border);
+    letter-spacing: 0.08em;
+}
+
+.form-field-input {
+    width: 100%;
+    padding: 14px 18px;
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    color: var(--text);
+    font-family: 'Press Start 2P', system-ui;
+    font-size: 0.52rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    appearance: none;
+    background-image: none;
+}
+
+select.form-field-input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 14px;
+    padding-right: 40px;
+    cursor: pointer;
+}
+
+.form-field-input:focus {
+    border-color: var(--neon);
+    box-shadow: 0 0 0 3px var(--neon-dim);
+}
+
+.form-field-input::placeholder {
+    color: var(--border);
+    font-size: 0.45rem;
+}
+
+.form-field-textarea {
+    min-height: 130px;
+    resize: vertical;
+    line-height: 2;
+}
+
+.form-field-row {
+    display: flex;
+    align-items: center;
+}
+
+.form-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.form-toggle-check {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.form-toggle-box {
+    width: 40px;
+    height: 22px;
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    flex-shrink: 0;
+    position: relative;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.form-toggle-box::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 14px;
+    height: 14px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.form-toggle-check:checked + .form-toggle-box {
+    background: var(--neon-dim);
+    border-color: var(--neon);
+}
+
+.form-toggle-check:checked + .form-toggle-box::after {
+    transform: translateX(18px);
+    background: var(--neon);
+}
+
+.form-toggle-text {
+    font-family: 'Press Start 2P', system-ui;
+    font-size: 0.42rem;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+}
+
+.form-submit-btn {
+    width: 100%;
+    padding: 18px;
+    background: var(--neon);
+    border: none;
+    border-radius: 14px;
+    color: #000;
+    font-family: 'Press Start 2P', system-ui;
+    font-size: 0.55rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+}
+
+.form-submit-btn:hover {
+    background: #fff;
+    box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+}
+
+.form-submit-btn:active {
+    transform: scale(0.98);
+}
+
+.form-submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.form-status {
+    font-family: 'Press Start 2P', system-ui;
+    font-size: 0.42rem;
+    text-align: center;
+    min-height: 1rem;
+    letter-spacing: 0.06em;
+}
+
+.form-stars {
+    display: flex;
+    gap: 6px;
+}
+
+.form-star {
+    font-size: 2rem;
+    color: var(--border);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.15s, transform 0.15s;
+    padding: 4px;
+    line-height: 1;
+}
+
+.form-star:hover {
+    transform: scale(1.2);
+    color: var(--neon);
+}
+
+.form-rating-hint {
+    font-family: 'Press Start 2P', system-ui;
+    font-size: 0.38rem;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+    .form-screen-wrap {
+        flex-direction: column;
+        padding: 40px 20px 60px;
+        gap: 32px;
+    }
+    .form-screen-header {
+        width: 100%;
+        position: static;
+    }
+    .form-card {
+        padding: 24px 20px;
     }
 }

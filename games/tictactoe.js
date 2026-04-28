@@ -1,52 +1,69 @@
-let tttBoard = [], tttActive = true;
+let reactionTimes = [], reactionStart = 0, waitingForClick = false;
 
-window.initTTT = function() {
-    tttBoard = Array(9).fill(null); tttActive = true;
-    document.getElementById('ttt-status').textContent = 'YOUR TURN (X)';
-    const board = document.getElementById('ttt-board');
-    board.innerHTML = tttBoard.map((_, i) => `
-        <div onclick="makeTTTMove(${i})" class="board-cell aspect-square bg-zinc-900 border-2 border-zinc-800 rounded-2xl flex items-center justify-center text-4xl font-bold cursor-pointer"></div>
-    `).join('');
+window.initReactionGame = function() {
+    reactionTimes = [];
+    document.getElementById('reaction-results').innerHTML = '';
+    document.getElementById('reaction-best').textContent = 'BEST: --- ms';
+    document.getElementById('reaction-display').style.backgroundColor = '#27272a';
+    document.getElementById('reaction-text').textContent = 'READY?';
+    document.getElementById('reaction-start-btn').classList.remove('hidden');
+    document.getElementById('reaction-start-btn').textContent = 'START TEST';
+    document.getElementById('reaction-start-btn').onclick = window.startReactionTest;
+    window.updateCurrentScore(0);
 };
 
-window.makeTTTMove = function(i) {
-    if (!tttActive || tttBoard[i]) return;
-    tttBoard[i] = 'X';
-    renderTTT();
-    if (checkTTTWin('X')) { finishTTT('YOU WIN!'); window.updateCurrentScore(100); return; }
-    if (tttBoard.every(b => b)) { finishTTT("IT'S A DRAW"); return; }
-    tttActive = false;
-    document.getElementById('ttt-status').textContent = 'MACHINE THINKING...';
-    setTimeout(makeTTTBotMove, 600);
+window.startReactionTest = function() {
+    document.getElementById('reaction-start-btn').classList.add('hidden');
+    reactionTimes = [];
+    document.getElementById('reaction-results').innerHTML = '';
+    nextReactionRound();
 };
 
-function makeTTTBotMove() {
-    const empty = tttBoard.reduce((acc, b, i) => { if (b === null) acc.push(i); return acc; }, []);
-    const move = empty[Math.floor(Math.random() * empty.length)];
-    tttBoard[move] = 'O';
-    renderTTT();
-    if (checkTTTWin('O')) { finishTTT('MACHINE WINS'); return; }
-    if (tttBoard.every(b => b)) { finishTTT("IT'S A DRAW"); return; }
-    tttActive = true;
-    document.getElementById('ttt-status').textContent = 'YOUR TURN (X)';
+function nextReactionRound() {
+    if (reactionTimes.length >= 5) { finishReactionTest(); return; }
+    waitingForClick = false;
+    document.getElementById('reaction-display').style.backgroundColor = '#27272a';
+    document.getElementById('reaction-text').textContent = 'ROUND ' + (reactionTimes.length + 1) + ' --- WAIT...';
+    window.reactionTimeout = setTimeout(() => {
+        waitingForClick = true; reactionStart = Date.now();
+        document.getElementById('reaction-display').style.backgroundColor = '#00ff9d';
+        document.getElementById('reaction-text').innerHTML = '<span style="color:#000">CLICK!</span>';
+        window.playSound('click');
+    }, Math.random() * 3300 + 1200);
 }
 
-function renderTTT() {
-    const cells = document.querySelectorAll('#ttt-board .board-cell');
-    tttBoard.forEach((b, i) => {
-        cells[i].textContent = b || '';
-        if (b === 'X') cells[i].style.color = '#00ff9d';
-        if (b === 'O') cells[i].style.color = '#f43f5e';
-    });
-}
+window.handleReactionClick = function() {
+    if (!waitingForClick) {
+        clearTimeout(window.reactionTimeout);
+        document.getElementById('reaction-display').style.backgroundColor = '#f43f5e';
+        document.getElementById('reaction-text').textContent = 'TOO EARLY!';
+        reactionTimes.push(999);
+        setTimeout(nextReactionRound, 1200);
+        return;
+    }
+    const t = Date.now() - reactionStart; waitingForClick = false;
+    reactionTimes.push(t);
+    document.getElementById('reaction-display').style.backgroundColor = '#27272a';
+    document.getElementById('reaction-text').textContent = t + 'ms';
+    const el = document.createElement('div');
+    el.className = 'px-4 py-2 bg-zinc-800 rounded-2xl text-center';
+    el.innerHTML = '<div class="text-xs text-zinc-400">R' + reactionTimes.length + '</div><div class="text-2xl font-bold">' + t + '</div>';
+    document.getElementById('reaction-results').appendChild(el);
+    const best = Math.min(...reactionTimes);
+    document.getElementById('reaction-best').textContent = 'BEST: ' + best + 'ms';
+    window.updateCurrentScore(Math.max(0, 800 - best));
+    setTimeout(nextReactionRound, 900);
+};
 
-function checkTTTWin(p) {
-    const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-    return wins.some(w => w.every(i => tttBoard[i] === p));
-}
-
-function finishTTT(msg) {
-    tttActive = false;
-    document.getElementById('ttt-status').textContent = msg;
-    if (msg.includes('WIN')) window.playSound('win');
+function finishReactionTest() {
+    const valid = reactionTimes.filter(t => t < 999);
+    const avg = valid.length
+        ? Math.round(valid.reduce((a, b) => a + b, 0) / valid.length)
+        : 0;
+    document.getElementById('reaction-text').innerHTML = 'AVG<br><span class="text-5xl">' + avg + 'ms</span>';
+    const btn = document.getElementById('reaction-start-btn');
+    btn.textContent = 'PLAY AGAIN';
+    btn.onclick = window.initReactionGame;
+    btn.classList.remove('hidden');
+    window.playSound('win');
 }

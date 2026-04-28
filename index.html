@@ -92,7 +92,7 @@
                     <p class="text-zinc-500 text-[0.6rem] leading-relaxed">You will never win against my computer.</p>
                 </div>
                 <div onclick="startGame('reaction')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition">⚡</div>
+                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition" style="color:var(--neon);font-size:1.8rem"></div>
                     <h3 class="text-lg font-bold mb-2">REACTION</h3>
                     <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Test your speed reflexes.</p>
                 </div>
@@ -102,32 +102,28 @@
                     <p class="text-zinc-500 text-[0.6rem] leading-relaxed">10 Questions from web developing.</p>
                 </div>
                 <div onclick="startGame('snake')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition"></div>
+                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition" style="color:var(--neon);font-size:1.6rem"></div>
                     <h3 class="text-lg font-bold mb-2">SNAKE</h3>
                     <p class="text-zinc-500 text-[0.6rem] leading-relaxed">The well known snake game.</p>
                 </div>
                 <div onclick="startGame('scramble')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition"></div>
+                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition" style="font-size:1.6rem"></div>
                     <h3 class="text-lg font-bold mb-2">SCRAMBLE</h3>
                     <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Fix the word as soon as possible.</p>
                 </div>
                 <div onclick="startGame('numguess')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition"></div>
+                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition" style="font-size:1.6rem"></div>
                     <h3 class="text-lg font-bold mb-2">GUESS</h3>
                     <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Guess the number.</p>
                 </div>
                 <div onclick="startGame('hangman')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition"></div>
+                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition" style="font-size:1.6rem"></div>
                     <h3 class="text-lg font-bold mb-2">HANGMAN</h3>
                     <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Guess the word before the man is hanged.</p>
                 </div>
             </div>
 
-            <div class="mt-20 flex justify-center">
-                <button onclick="openLB()" class="px-12 py-5 bg-zinc-900 border-2 border-[#00ff9d] text-[#00ff9d] rounded-full font-bold text-xs tracking-[0.3em] hover:bg-[#00ff9d] hover:text-black transition shadow-[0_0_20px_rgba(0,255,157,0.2)]">
-                    VIEW LEADERBOARD
-                </button>
-            </div>
+            
         </div>
         
         <div id="screen-game" class="screen hidden max-w-6xl mx-auto px-8 py-12">
@@ -263,6 +259,188 @@
         </div>
     </div>
     
+        <div id="screen-leaderboard" class="screen hidden">
+            <div class="lb-topbar">
+                <div class="lb-topbar-inner">
+                    <div class="lb-tabs">
+                        <button id="lb-tab-global" onclick="switchLBTab('global')" class="lb-tab active">GLOBAL</button>
+                        <button id="lb-tab-mine"   onclick="switchLBTab('mine')"   class="lb-tab">MY SCORES</button>
+                    </div>
+                    <div class="lb-game-pills">
+                        <button onclick="selectLBGame('global')"    id="lbg-global"    class="lb-game-btn active-pill">GLOBAL</button>
+                        <button onclick="selectLBGame('memory')"    id="lbg-memory"    class="lb-game-btn">MEMORY</button>
+                        <button onclick="selectLBGame('tictactoe')" id="lbg-tictactoe" class="lb-game-btn">TIC TAC</button>
+                        <button onclick="selectLBGame('reaction')"  id="lbg-reaction"  class="lb-game-btn">REACTION</button>
+                        <button onclick="selectLBGame('quiz')"      id="lbg-quiz"      class="lb-game-btn">QUIZ</button>
+                        <button onclick="selectLBGame('snake')"     id="lbg-snake"     class="lb-game-btn">SNAKE</button>
+                        <button onclick="selectLBGame('scramble')"  id="lbg-scramble"  class="lb-game-btn">SCRAMBLE</button>
+                        <button onclick="selectLBGame('numguess')"  id="lbg-numguess"  class="lb-game-btn">NUMGUESS</button>
+                        <button onclick="selectLBGame('hangman')"   id="lbg-hangman"   class="lb-game-btn">HANGMAN</button>
+                    </div>
+                </div>
+            </div>
+            <div class="px-8" style="padding-top:90px;padding-bottom:60px;max-width:680px;margin-left:0%;">
+                <h2 class="text-3xl font-bold mb-8">LEADERBOARD</h2>
+                <div id="lb-content">
+                    <div class="text-center py-12 text-zinc-500 text-xs">Loading scores...</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-about" class="screen hidden">
+            <div class="max-w-2xl mx-auto px-8 py-16">
+                <h2 class="text-3xl font-bold mb-12">ABOUT</h2>
+                <div class="about-profile-card mb-8">
+                    <div class="about-avatar-big">SD</div>
+                    <div class="about-profile-info">
+                        <div class="about-name">SAVINDU DAMSARA</div>
+                        <div class="about-nick">aka <span style="color:var(--neon)">DREAMXHAVA</span></div>
+                    </div>
+                </div>
+                <div class="about-info-grid mb-8">
+                    <div class="about-info-row">
+                        <span class="about-info-label">AGE</span>
+                        <span class="about-info-val">--</span>
+                    </div>
+                    <div class="about-info-row">
+                        <span class="about-info-label">COUNTRY</span>
+                        <span class="about-info-val">SRI LANKA</span>
+                    </div>
+                    <div class="about-info-row">
+                        <span class="about-info-label">GITHUB</span>
+                        <a href="https://github.com/savindudam" target="_blank" class="about-info-link">savindudam</a>
+                    </div>
+                    <div class="about-info-row">
+                        <span class="about-info-label">INSTAGRAM</span>
+                        <a href="https://instagram.com/dreamxhava_2" target="_blank" class="about-info-link">@dreamxhava_2</a>
+                    </div>
+                </div>
+                <div class="about-desc-card">
+                    <p class="about-desc-text">Built this arcade as a personal project to practice web dev. All games are coded from scratch -- no game engines, just vanilla JS and a lot of trial and error.</p>
+                    <p class="about-desc-text" style="margin-top:1rem">If something is broken, hit Report Bug. If you have an idea, hit Suggest. I actually read them.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-report" class="screen hidden">
+            <div class="form-screen-wrap">
+                <div class="form-screen-header">
+                    <div class="form-screen-tag">REPORT</div>
+                    <h2 class="form-screen-title">FOUND A BUG?</h2>
+                    <p class="form-screen-sub">Describe what broke and I will look into it.</p>
+                </div>
+                <div class="form-card">
+                    <div class="form-field">
+                        <label class="form-field-label">WHICH GAME</label>
+                        <select id="report-game" class="form-field-input">
+                            <option value="general">General / UI</option>
+                            <option value="memory">Memory</option>
+                            <option value="tictactoe">Tic Tac</option>
+                            <option value="reaction">Reaction</option>
+                            <option value="quiz">Quiz</option>
+                            <option value="snake">Snake</option>
+                            <option value="scramble">Scramble</option>
+                            <option value="numguess">Num Guess</option>
+                            <option value="hangman">Hangman</option>
+                            <option value="leaderboard">Leaderboard</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label class="form-field-label">DESCRIBE THE BUG</label>
+                        <textarea id="report-desc" class="form-field-input form-field-textarea" placeholder="What happened? What were you doing when it broke?"></textarea>
+                    </div>
+                    <div class="form-field-row">
+                        <label class="form-toggle-label">
+                            <input type="checkbox" id="report-anon" class="form-toggle-check">
+                            <span class="form-toggle-box"></span>
+                            <span class="form-toggle-text">SEND ANONYMOUSLY</span>
+                        </label>
+                    </div>
+                    <button onclick="submitReport()" class="form-submit-btn">SEND REPORT</button>
+                    <p id="report-status" class="form-status"></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-suggest" class="screen hidden">
+            <div class="form-screen-wrap">
+                <div class="form-screen-header">
+                    <div class="form-screen-tag">SUGGEST</div>
+                    <h2 class="form-screen-title">GOT AN IDEA?</h2>
+                    <p class="form-screen-sub">Tell me what game you want next. I actually read these.</p>
+                </div>
+                <div class="form-card">
+                    <div class="form-field">
+                        <label class="form-field-label">GAME NAME</label>
+                        <input type="text" id="suggest-name" class="form-field-input" placeholder="e.g. Minesweeper, Tetris, Wordle...">
+                    </div>
+                    <div class="form-field">
+                        <label class="form-field-label">DETAILS <span class="form-field-optional">OPTIONAL</span></label>
+                        <textarea id="suggest-desc" class="form-field-input form-field-textarea" placeholder="How should it work? Any special rules or ideas?"></textarea>
+                    </div>
+                    <div class="form-field-row">
+                        <label class="form-toggle-label">
+                            <input type="checkbox" id="suggest-anon" class="form-toggle-check">
+                            <span class="form-toggle-box"></span>
+                            <span class="form-toggle-text">SEND ANONYMOUSLY</span>
+                        </label>
+                    </div>
+                    <button onclick="submitSuggestion()" class="form-submit-btn">SEND SUGGESTION</button>
+                    <p id="suggest-status" class="form-status"></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-review" class="screen hidden">
+            <div class="form-screen-wrap">
+                <div class="form-screen-header">
+                    <div class="form-screen-tag">REVIEW</div>
+                    <h2 class="form-screen-title">LEAVE A REVIEW</h2>
+                    <p class="form-screen-sub">Let me know what you think. Good or bad.</p>
+                </div>
+                <div class="form-card">
+                    <div class="form-field">
+                        <label class="form-field-label">YOUR RATING</label>
+                        <div id="review-stars" class="form-stars">
+                            <button onclick="setReviewRating(1)" class="star-btn form-star">&#9733;</button>
+                            <button onclick="setReviewRating(2)" class="star-btn form-star">&#9733;</button>
+                            <button onclick="setReviewRating(3)" class="star-btn form-star">&#9733;</button>
+                            <button onclick="setReviewRating(4)" class="star-btn form-star">&#9733;</button>
+                            <button onclick="setReviewRating(5)" class="star-btn form-star">&#9733;</button>
+                        </div>
+                        <p id="review-rating-text" class="form-rating-hint">Click a star to rate</p>
+                    </div>
+                    <div class="form-field">
+                        <label class="form-field-label">FAVORITE GAME <span class="form-field-optional">OPTIONAL</span></label>
+                        <select id="review-game" class="form-field-input">
+                            <option value="">-- Select a game --</option>
+                            <option value="memory">Memory</option>
+                            <option value="tictactoe">Tic Tac</option>
+                            <option value="reaction">Reaction</option>
+                            <option value="quiz">Quiz</option>
+                            <option value="snake">Snake</option>
+                            <option value="scramble">Scramble</option>
+                            <option value="numguess">Num Guess</option>
+                            <option value="hangman">Hangman</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label class="form-field-label">YOUR REVIEW</label>
+                        <textarea id="review-text" class="form-field-input form-field-textarea" placeholder="What do you like? What could be better?"></textarea>
+                    </div>
+                    <div class="form-field-row">
+                        <label class="form-toggle-label">
+                            <input type="checkbox" id="review-anon" class="form-toggle-check">
+                            <span class="form-toggle-box"></span>
+                            <span class="form-toggle-text">SEND ANONYMOUSLY</span>
+                        </label>
+                    </div>
+                    <button onclick="submitReview()" class="form-submit-btn">SUBMIT REVIEW</button>
+                    <p id="review-status" class="form-status"></p>
+                </div>
+            </div>
+        </div>
+
     <!-- End main-content wrapper -->
     </div>
 
@@ -311,37 +489,6 @@
             <button onclick="hideAuthModal()" class="mt-4 w-full py-3 text-xs text-zinc-500 hover:text-white transition">CANCEL</button>
         </div>
     </div>
-<div id="screen-leaderboard" class="hidden" style="margin-left:var(--sidebar-w)">
-        <!-- Sticky top bar: tabs + game pills -->
-        <div class="lb-topbar">
-            <div class="lb-topbar-inner">
-                <!-- Left: Global / My Scores tabs -->
-                <div class="lb-tabs">
-                    <button id="lb-tab-global" onclick="switchLBTab('global')" class="lb-tab active">🌍 GLOBAL</button>
-                    <button id="lb-tab-mine"   onclick="switchLBTab('mine')"   class="lb-tab">👤 MY SCORES</button>
-                </div>
-                <!-- Right: scrollable game pills -->
-                <div class="lb-game-pills">
-                    <button onclick="selectLBGame('global')"    id="lbg-global"    class="lb-game-btn active-pill">🌐 GLOBAL</button>
-                    <button onclick="selectLBGame('memory')"    id="lbg-memory"    class="lb-game-btn"> MEMORY </button>
-                    <button onclick="selectLBGame('tictactoe')" id="lbg-tictactoe" class="lb-game-btn"> TIC TAC </button>
-                    <button onclick="selectLBGame('reaction')"  id="lbg-reaction"  class="lb-game-btn"> REACTION </button>
-                    <button onclick="selectLBGame('quiz')"      id="lbg-quiz"      class="lb-game-btn"> QUIZ </button>
-                    <button onclick="selectLBGame('snake')"     id="lbg-snake"     class="lb-game-btn"> SNAKE </button>
-                    <button onclick="selectLBGame('scramble')"  id="lbg-scramble"  class="lb-game-btn"> SCRAMBLE </button>
-                    <button onclick="selectLBGame('numguess')"  id="lbg-numguess"  class="lb-game-btn"> NUMGUESS </button>
-                    <button onclick="selectLBGame('hangman')"   id="lbg-hangman"   class="lb-game-btn"> HANGMAN </button>
-                </div>
-            </div>
-        </div>
-        <!-- Scores list -->
-        <div class="max-w-2xl mx-auto px-8" style="padding-top:60px;padding-bottom:40px;">
-            <h2 class="text-3xl font-bold mb-8">LEADERBOARD</h2>
-            <div id="lb-content">
-                <div class="text-center py-12 text-zinc-500 text-xs">Loading scores...</div>
-            </div>
-        </div>
-    </div>
 
 
 
@@ -357,149 +504,7 @@
 
 
 
-<div id="screen-about" class="hidden" style="margin-left:var(--sidebar-w)">
-    <div class="max-w-2xl mx-auto px-8 py-16">
-        <h2 class="text-3xl font-bold mb-12">ABOUT</h2>
 
-        <div class="about-profile-card mb-8">
-            <div class="about-avatar-big"></div>
-            <div class="about-profile-info">
-                <div class="about-name">SAVINDU DAMSARA</div>
-                <div class="about-nick">aka <span style="color:var(--neon)">DREAMXHAVA</span></div>
-            </div>
-        </div>
-
-        <div class="about-info-grid mb-8">
-            <div class="about-info-row">
-                <span class="about-info-label">AGE</span>
-                <span class="about-info-val">—</span>
-            </div>
-            <div class="about-info-row">
-                <span class="about-info-label">COUNTRY</span>
-                <span class="about-info-val">🇱🇰 SRI LANKA</span>
-            </div>
-            <div class="about-info-row">
-                <span class="about-info-label">GITHUB</span>
-                <a href="https://github.com/savindudam" target="_blank" class="about-info-link">savindudam</a>
-            </div>
-            <div class="about-info-row">
-                <span class="about-info-label">INSTAGRAM</span>
-                <a href="https://instagram.com/dreamxhava_2" target="_blank" class="about-info-link">@dreamxhava_2</a>
-            </div>
-        </div>
-
-        <div class="about-desc-card">
-            <p class="about-desc-text">Built this arcade as a personal project to practice web dev. All games are coded from scratch — no game engines, just vanilla JS and a lot of trial and error.</p>
-            <p class="about-desc-text" style="margin-top:1rem">If something is broken, hit Report Bug. If you have an idea, hit Suggest. I actually read them.</p>
-        </div>
-    </div>
-</div>
-
-<div id="screen-report" class="hidden" style="margin-left:var(--sidebar-w)">
-    <div class="max-w-xl mx-auto px-8 py-16">
-        <h2 class="text-3xl font-bold mb-2">REPORT BUG</h2>
-        <p class="text-zinc-500 mb-10" style="font-size:0.5rem;letter-spacing:0.08em">Found something broken? Let me know.</p>
-        <div class="form-group">
-            <label class="form-label">WHICH GAME?</label>
-            <select id="report-game" class="form-select">
-                <option value="general">General / UI</option>
-                <option value="memory">Memory</option>
-                <option value="tictactoe">Tic Tac</option>
-                <option value="reaction">Reaction</option>
-                <option value="quiz">Quiz</option>
-                <option value="snake">Snake</option>
-                <option value="scramble">Scramble</option>
-                <option value="numguess">Num Guess</option>
-                <option value="hangman">Hangman</option>
-                <option value="leaderboard">Leaderboard</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label class="form-label">DESCRIBE THE BUG</label>
-            <textarea id="report-desc" class="form-textarea" placeholder="What happened? What were you doing?"></textarea>
-        </div>
-        <div class="form-group">
-            <label class="anon-label">
-                <input type="checkbox" id="report-anon" class="anon-checkbox">
-                <span style="font-size:0.45rem;color:var(--text-muted);letter-spacing:0.08em">SEND ANONYMOUSLY</span>
-            </label>
-        </div>
-        <button onclick="submitReport()" class="submit-btn">SEND REPORT</button>
-        <p id="report-status" class="mt-4 text-center" style="font-size:0.45rem;min-height:1rem"></p>
-    </div>
-</div>
-
-<div id="screen-suggest" class="hidden" style="margin-left:var(--sidebar-w)">
-    <div class="max-w-xl mx-auto px-8 py-16">
-        <h2 class="text-3xl font-bold mb-2">SUGGEST A GAME</h2>
-        <p class="text-zinc-500 mb-10" style="font-size:0.5rem;letter-spacing:0.08em">Got an idea? I might actually build it.</p>
-        <div class="form-group">
-            <label class="form-label">GAME NAME / IDEA</label>
-            <input type="text" id="suggest-name" placeholder="e.g. Minesweeper, Tetris...">
-        </div>
-        <div class="form-group">
-            <label class="form-label">DETAILS (OPTIONAL)</label>
-            <textarea id="suggest-desc" class="form-textarea" placeholder="How should it work? Any special rules?"></textarea>
-        </div>
-        <div class="form-group">
-            <label class="anon-label">
-                <input type="checkbox" id="suggest-anon" class="anon-checkbox">
-                <span style="font-size:0.45rem;color:var(--text-muted);letter-spacing:0.08em">SEND ANONYMOUSLY</span>
-            </label>
-        </div>
-        <button onclick="submitSuggestion()" class="submit-btn">SEND SUGGESTION</button>
-        <p id="suggest-status" class="mt-4 text-center" style="font-size:0.45rem;min-height:1rem"></p>
-    </div>
-</div>
-
-<div id="screen-review" class="hidden" style="margin-left:var(--sidebar-w)">
-    <div class="max-w-xl mx-auto px-8 py-16">
-        <h2 class="text-3xl font-bold mb-2">LEAVE A REVIEW</h2>
-        <p class="text-zinc-500 mb-10" style="font-size:0.5rem;letter-spacing:0.08em">Let me know what you think of Mini Arcade!</p>
-        
-        <div class="form-group">
-            <label class="form-label">RATING</label>
-            <div id="review-stars" class="flex gap-3 mb-2">
-                <button onclick="setReviewRating(1)" class="star-btn text-3xl opacity-40 hover:opacity-100 transition">&#9733;</button>
-                <button onclick="setReviewRating(2)" class="star-btn text-3xl opacity-40 hover:opacity-100 transition">&#9733;</button>
-                <button onclick="setReviewRating(3)" class="star-btn text-3xl opacity-40 hover:opacity-100 transition">&#9733;</button>
-                <button onclick="setReviewRating(4)" class="star-btn text-3xl opacity-40 hover:opacity-100 transition">&#9733;</button>
-                <button onclick="setReviewRating(5)" class="star-btn text-3xl opacity-40 hover:opacity-100 transition">&#9733;</button>
-            </div>
-            <p id="review-rating-text" class="text-xs text-zinc-500">Select a rating</p>
-        </div>
-        
-        <div class="form-group">
-            <label class="form-label">FAVORITE GAME (OPTIONAL)</label>
-            <select id="review-game" class="form-select">
-                <option value="">-- Select a game --</option>
-                <option value="memory">Memory</option>
-                <option value="tictactoe">Tic Tac</option>
-                <option value="reaction">Reaction</option>
-                <option value="quiz">Quiz</option>
-                <option value="snake">Snake</option>
-                <option value="scramble">Scramble</option>
-                <option value="numguess">Num Guess</option>
-                <option value="hangman">Hangman</option>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label class="form-label">YOUR REVIEW</label>
-            <textarea id="review-text" class="form-textarea" placeholder="What do you like? What could be better?"></textarea>
-        </div>
-        
-        <div class="form-group">
-            <label class="anon-label">
-                <input type="checkbox" id="review-anon" class="anon-checkbox">
-                <span style="font-size:0.45rem;color:var(--text-muted);letter-spacing:0.08em">SEND ANONYMOUSLY</span>
-            </label>
-        </div>
-        
-        <button onclick="submitReview()" class="submit-btn">SUBMIT REVIEW</button>
-        <p id="review-status" class="mt-4 text-center" style="font-size:0.45rem;min-height:1rem"></p>
-    </div>
-</div>
 
     <script src="scripts/main.js"></script>
     <script src="games/memory.js"></script>
@@ -515,8 +520,8 @@
 
 
 
-<!--Notes myself 
-        1- add games to the games folder and update ledger in the notepad to keep the track of it for the readme 
+<!-- 1- add games to the games folder and update ledger in the notepad to keep the track of it for the readme 
         2- before shipping the project check for the enviroment variables -->
+       
 </body>
 </html>
