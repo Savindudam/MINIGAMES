@@ -1,4 +1,4 @@
-// Snake
+
 let snakeCells, snakeDir, snakeNextDir, snakeFood, snakeBest = 0, snakePts = 0, snakeRunning = false;
 const SNAKE_COLS = 20, SNAKE_ROWS = 20, CELL = 20;
 

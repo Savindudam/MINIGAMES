@@ -81,9 +81,9 @@ function friendlyAuthError(e) {
 
 window.fbRegister = async function() {
     const name  = document.getElementById('auth-name').value.trim();
-    const email = document.getElementById('auth-email').value.trim();
-    const pass  = document.getElementById('auth-pass').value;
-    const err   = document.getElementById('auth-error');
+    const email = document.getElementById('auth-email-reg').value.trim();
+    const pass  = document.getElementById('auth-pass-reg').value;
+    const err   = document.getElementById('auth-error-reg');
     err.textContent = '';
 
     if (!name || !email || !pass) { err.textContent = 'Fill in all fields.'; return; }

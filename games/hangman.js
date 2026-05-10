@@ -21,7 +21,11 @@ window.initHangman = function() {
     document.getElementById('hm-result').classList.add('hidden');
     document.getElementById('hm-keyboard').classList.remove('hidden');
     document.getElementById('hm-word').classList.remove('hidden');
-    ['head','body','larm','rarm','lleg','rleg'].forEach(id => document.getElementById('hm-' + id).classList.add('hidden'));
+    ['head','body','larm','rarm','lleg','rleg'].forEach(id => {
+        const el = document.getElementById('hm-' + id);
+        el.classList.remove('show');
+        el.style.display = 'none';
+    });
     renderHangman();
 };
 
@@ -47,7 +51,11 @@ window.guessHangman = function(l) {
         document.getElementById('hm-lives').textContent = hmLives;
         const parts = ['head','body','larm','rarm','lleg','rleg'];
         const idx = 5 - hmLives;
-        if (parts[idx]) document.getElementById('hm-' + parts[idx]).classList.remove('hidden');
+        if (parts[idx]) {
+            const partEl = document.getElementById('hm-' + parts[idx]);
+            partEl.style.display = '';
+            partEl.classList.add('show');
+        }
         window.playSound('click');
     } else window.playSound('match');
     renderHangman();

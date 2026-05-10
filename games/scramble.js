@@ -41,13 +41,13 @@ window.checkScramble = function() {
     if (val === scrambleData[scrambleIdx].w) {
         scramblePts += 100 + scrambleTime * 5;
         document.getElementById('scramble-pts').textContent = scramblePts;
-        document.getElementById('scramble-feedback').textContent = 'CORRECT! ✅';
+        document.getElementById('scramble-feedback').textContent = 'CORRECT! ';
         document.getElementById('scramble-feedback').style.color = '#00ff9d';
         window.playSound('match');
         scrambleIdx++;
         setTimeout(nextScrambleWord, 1000);
     } else {
-        document.getElementById('scramble-feedback').textContent = 'TRY AGAIN ❌';
+        document.getElementById('scramble-feedback').textContent = 'TRY AGAIN ';
      document.getElementById('scramble-feedback').style.color = '#f43f5e';
         window.playSound('click');
     }

@@ -1,527 +1,1413 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini Arcade • Play Now</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MINI ARCADE</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --accent: #2c2c2c;
+  --accent2: #c0392b;
+  --accent3: #6c757d;
+  --bg: #f5f4f1;
+  --bg2: #eeede9;
+  --bg3: #e8e7e3;
+  --card: #ffffff;
+  --border: #d8d6d0;
+  --text: #1a1a1a;
+  --muted: #888580;
+  --neon: #00ff9d;   
+  --neon2: #f43f5e;  
+  --font-head: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
 
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-mono);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.topbar, .hero, .section, .lb-section, footer {
+  position: relative;
+  z-index: 1;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  height: 60px;
+  background: rgba(245,244,241,0.95);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+}
+
+.logo {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  width: 28px; height: 28px;
+  background: var(--text);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+  padding: 6px;
+  border-radius: 4px;
+}
+
+.logo-icon span {
+  background: var(--bg);
+  border-radius: 1px;
+  display: block;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.score-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+}
+
+.score-pill span { color: var(--accent); font-weight: 500; }
+
+.btn-top {
+  padding: 7px 16px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: all 0.15s;
+  border-radius: 4px;
+}
+
+.btn-top:hover { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+.user-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  color: var(--text);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+}
+
+.hero {
+  padding: 64px 32px 48px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero h1 {
+  font-family: var(--font-head);
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.hero h1 .line1 { color: var(--text); }
+.hero h1 .line2 {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.hero-sub {
+  font-size: 0.8rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  margin-bottom: 40px;
+  font-family: var(--font-mono);
+}
+
+.stats-row {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  max-width: 480px;
+  margin: 0 auto;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--card);
+}
+.stat-box {
+  flex: 1;
+  padding: 18px 16px;
+  border-right: 1px solid var(--border);
+  text-align: center;
+}.stat-box:last-child { border-right: none; }
+
+.stat-val {
+  font-family: var(--font-head);
+  font-size: 1.4rem;
+  color: var(--text);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.stat-lbl {
+  font-size: 0.6rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+}
+.section {
+  padding: 32px 32px 64px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.section-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.game-card {
+  position: relative;
+  background: var(--card);
+  padding: 24px 20px 20px;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.game-card::before { display: none; }
+
+.game-card:hover {
+  background: var(--bg2);
+}
+
+.game-card:hover .game-card-glow { display: none; }
+.game-card-glow { display: none; }
+
+
+
+.game-name {
+  font-family: var(--font-head);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+
+.game-desc {
+  font-size: 0.65rem;
+  color: var(--muted);
+  line-height: 1.5;
+  font-family: var(--font-mono);
+}
+
+.game-tag {
+  display: inline-block;
+  padding: 2px 7px;
+  font-size: 0.5rem;
+  letter-spacing: 0.06em;
+  border: 1px solid var(--border);
+  margin-top: auto;
+  width: fit-content;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.tag-classic, .tag-brain, .tag-reflex, .tag-puzzle, .tag-action {
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+.play-btn-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(26,26,26,0.04);
+  opacity: 0;
+  transition: opacity 0.15s;
+}.game-card:hover .play-btn-overlay { opacity: 1; }
+
+.play-btn-inner {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 7px 14px;
+  background: var(--card);
+  border-radius: 4px;
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(245,244,241,0.85);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(8px);
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  width: 100%;
+  max-width: 760px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.1);
+}
+
+.modal-box::before { display: none; }
+
+.modal-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--bg2);
+}
+
+.modal-gametitle {
+  font-family: var(--font-head);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+
+.modal-score-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-score {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+}
+
+.modal-score span {
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.btn-save-score {
+  padding: 6px 14px;
+  background: var(--text);
+  border: none;
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: all 0.15s;
+  font-weight: 500;
+  border-radius: 4px;
+}
+
+.btn-save-score:hover { background: #444; }
+
+.btn-close-modal {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  width: 30px; height: 30px;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+  border-radius: 4px;
+}
+
+.btn-close-modal:hover { border-color: var(--text); color: var(--text); }
+
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg);
+}
+
+.modal-body::-webkit-scrollbar { width: 3px; }
+.modal-body::-webkit-scrollbar-thumb { background: var(--border); }
+.lb-section {
+  padding: 0 32px 64px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.lb-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 0;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+}
+
+.lb-tab {
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-transform: uppercase;
+  margin-bottom: -1px;
+}
+
+.lb-tab:hover { color: var(--text); }
+.lb-tab.active { color: var(--text); border-bottom-color: var(--text); }
+.lb-table-wrap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  overflow-x: auto;
+}
+
+.lb-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.lb-table th {
+  background: var(--bg2);
+  padding: 10px 16px;
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  text-transform: uppercase;
+}
+
+.lb-table td {
+  padding: 11px 16px;
+  border-bottom: 1px solid rgba(216,214,208,0.5);
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+}
+
+.lb-table tr:last-child td { border-bottom: none; }
+.lb-table tr:hover td { background: var(--bg2); }
+
+.rank-num {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.rank-num.r1 { color: #b8860b; }
+.rank-num.r2 { color: #777; }
+.rank-num.r3 { color: #8b6344; }
+.auth-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(245,244,241,0.85);
+  z-index: 600;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(8px);
+}
+
+.auth-overlay.open { display: flex; }
+
+.auth-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  width: 100%;
+  max-width: 360px;
+  padding: 32px;
+  position: relative;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+}
+.auth-box::before { display: none; }
+
+.auth-title {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  margin-bottom: 24px;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 11px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  margin-bottom: 10px;
+  outline: none;
+  transition: border-color 0.15s;
+  border-radius: 4px;
+}
+
+.auth-input:focus { border-color: var(--text); }
+.auth-input::placeholder { color: var(--muted); }
+
+.auth-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--text);
+  border: none;
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+  transition: background 0.15s;
+  border-radius: 4px;
+}
+
+.auth-btn:hover { background: #333; }
+.auth-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.auth-btn-sec {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 4px;
+}
+
+.auth-btn-sec:hover { border-color: var(--text); background: var(--bg2); }
+
+.auth-err {
+  color: var(--accent2);
+  font-size: 0.65rem;
+  min-height: 18px;
+  margin-bottom: 8px;
+  font-family: var(--font-mono);
+}
+
+.auth-switch {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 0.65rem;
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+
+.auth-switch button {
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-decoration: underline;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 0;
+  color: var(--muted);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  font-family: var(--font-mono);
+}
+
+.auth-divider::before, .auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.btn-close-auth {
+  position: absolute;
+  top: 12px; right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.btn-close-auth:hover { color: var(--text); }
+.mem-grid-wrap { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; max-width: 380px; width: 100%; }
+.flip-card { perspective: 800px; aspect-ratio: 1; cursor: pointer; }
+.flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.35s; transform-style: preserve-3d; }
+.flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+.flip-card-front, .flip-card-back { position: absolute; inset: 0; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); }
+.flip-card-front { background: var(--bg3); font-family: var(--font-head); font-size: 1.2rem; color: var(--muted); }
+.flip-card-back { background: rgba(0,255,157,0.12); border-color: rgba(0,255,157,0.3); transform: rotateY(180deg); font-size: 2rem; }
+#snake-canvas { border: 1px solid var(--border); display: block; }
+#snake-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+#reaction-display { width: 100%; max-width: 420px; height: 160px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid var(--border); transition: background 0.1s; margin-bottom: 16px; }
+
+#hm-head, #hm-body, #hm-larm, #hm-rarm, #hm-lleg, #hm-rleg { display: none; }
+#hm-head.show, #hm-body.show, #hm-larm.show, #hm-rarm.show, #hm-lleg.show, #hm-rleg.show { display: block; }
+
+#sudoku-grid { display: grid; grid-template-columns: repeat(9,1fr); gap: 2px; max-width: 340px; width: 100%; }
+#sudoku-grid input { width: 100%; aspect-ratio: 1; text-align: center; background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: var(--font-mono); font-size: 0.75rem; outline: none; }
+#sudoku-grid input:focus { border-color: var(--neon); }
+#sudoku-grid input:disabled { color: var(--neon); background: var(--bg); }
+
+.quiz-opt { width: 100%; text-align: left; padding: 14px 18px; background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: var(--font-mono); font-size: 0.75rem; cursor: pointer; transition: border-color 0.15s; margin-bottom: 8px; }
+.quiz-opt:hover:not(:disabled) { border-color: var(--neon); }
+
+#mine-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; max-width: 360px; width: 100%; }
+.mine-cell { aspect-ratio: 1; background: var(--bg3); border: 1px solid var(--border); font-family: var(--font-mono); font-size: 0.65rem; cursor: pointer; color: var(--neon); display: flex; align-items: center; justify-content: center; }
+.mine-cell:hover { border-color: var(--neon); }
+.mine-cell.revealed { background: var(--bg); cursor: default; }
+
+#simon-board { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-width: 280px; width: 100%; }
+.simon-btn { aspect-ratio: 1; border: none; cursor: pointer; border-radius: 4px; opacity: 0.4; transition: opacity 0.1s; }
+.simon-btn.lit { opacity: 1; }
+#grid-2048 { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; background: var(--bg3); padding: 6px; max-width: 320px; width: 100%; }
+.tile-2048 { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 1rem; font-weight: 700; border: 1px solid var(--border); }
+#colormatch-word { font-family: var(--font-head); font-size: 2.5rem; font-weight: 900; margin-bottom: 24px; letter-spacing: 0.1em; }
+#colormatch-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-width: 280px; width: 100%; }
+.color-btn { padding: 20px; border: none; font-family: var(--font-head); font-size: 0.55rem; letter-spacing: 0.1em; cursor: pointer; font-weight: 700; color: #000; transition: transform 0.1s; }
+.color-btn:hover { transform: scale(1.04); }
+#numguess-hint { font-family: var(--font-head); font-size: 1rem; color: var(--neon); min-height: 36px; }
+
+#mole-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 320px; width: 100%; }
+.hole { aspect-ratio: 1; background: var(--bg3); border: 1px solid var(--border); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 2rem; transition: all 0.1s; position: relative; overflow: hidden; }
+.hole:hover { border-color: var(--neon); }
+.mole-visible { background: rgba(0,255,157,0.12); border-color: var(--neon) !important; }
+
+#scramble-word-display { font-family: var(--font-head); font-size: 2rem; letter-spacing: 0.3em; color: var(--neon); margin-bottom: 8px; }
+
+#hm-keyboard { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; max-width: 360px; width: 100%; }
+.hm-key { width: 36px; height: 36px; background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: var(--font-mono); font-size: 0.7rem; cursor: pointer; transition: all 0.1s; }
+.hm-key:hover:not(:disabled) { border-color: var(--neon); color: var(--neon); }
+.hm-key:disabled { opacity: 0.25; cursor: default; }
+.game-input {
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+  max-width: 280px;
+}
+.game-input:focus { border-color: var(--neon); }
+
+.game-btn {
+  padding: 10px 22px;
+  background: var(--neon);
+  border: none;
+  color: #000;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  transition: background 0.15s;
+}
+.game-btn:hover { background: #00cc7e; }
+
+.game-btn-sec {
+  padding: 10px 22px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: all 0.15s;
+}
+.game-btn-sec:hover { border-color: var(--neon); color: var(--neon); }
+
+.game-stat { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.1em; }
+.game-stat span { color: var(--text); }
+canvas { display: block; max-width: 100%; }
+#tower-canvas, #flappy-canvas, #breakout-canvas { border: 1px solid var(--border); }
+#tetris-canvas { border: 1px solid var(--border); }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.flex-col { display: flex; flex-direction: column; align-items: center; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+.gap-16 { gap: 16px; }
+.w-full { width: 100%; }
+.text-center { text-align: center; }
+.mt-8 { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.mt-24 { margin-top: 24px; }
+.mb-8 { margin-bottom: 8px; }
+.mb-16 { margin-bottom: 16px; }
+.hidden { display: none !important; }
+footer {
+  border-top: 1px solid var(--border);
+  padding: 24px 32px;
+  text-align: center;
+  font-size: 0.6rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+}
+
+@media (max-width: 600px) {
+  .topbar { padding: 0 16px; }
+  .hero { padding: 40px 16px 32px; }
+  .section, .lb-section { padding-left: 16px; padding-right: 16px; }
+  .games-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .stats-row { flex-wrap: wrap; }
+  .stat-box { min-width: 120px; }
+}
+</style>
 </head>
-<body class="bg-zinc-950 text-white min-h-screen flex">
-
-    <aside id="sidebar" class="sidebar">
- 
-        <!-- Logo -->
-        <div class="sidebar-logo">
-            <div class="sidebar-logo-icon"></div>
-            <span class="sidebar-logo-text">MINI<br>ARCADE</span>
-        </div>
- 
-        <!-- Nav links -->
-        <nav class="sidebar-nav">
-            <button class="sidebar-btn active" id="nav-home" onclick="sidebarNav('home')">
-                <span class="sidebar-icon"></span>
-                <span class="sidebar-label">HOME</span>
-            </button>
-            <button class="sidebar-btn" id="nav-leaderboard" onclick="sidebarNav('leaderboard')">
-                <span class="sidebar-icon"></span>
-                <span class="sidebar-label">LEADERBOARD</span>
-            </button>
-            <button class="sidebar-btn" id="nav-about" onclick="sidebarNav('about')">
-                <span class="sidebar-icon"></span>
-                <span class="sidebar-label">ABOUT</span>
-            </button>
-            <button class="sidebar-btn" id="nav-report" onclick="sidebarNav('report')">
-                <span class="sidebar-icon"></span>
-                <span class="sidebar-label">REPORT BUG</span>
-            </button>
-            <button class="sidebar-btn" id="nav-suggest" onclick="sidebarNav('suggest')">
-                <span class="sidebar-icon"></span>
-                <span class="sidebar-label">SUGGEST</span>
-            </button>
-            <button class="sidebar-btn" id="nav-review" onclick="sidebarNav('review')">
-                <span class="sidebar-icon"></span>
-                <span class="sidebar-label">REVIEW</span>
-            </button>
-        </nav>
-        <div class="sidebar-footer">
-            <div id="nav-user-pill" class="sidebar-user-pill hidden">
-                <div class="sidebar-user-dot"></div>
-                <span id="nav-username" class="sidebar-label">GUEST</span>
-            </div>
-            <button id="mute-btn" onclick="toggleMute()" class="sidebar-btn" title="Toggle sound">
-                <span class="sidebar-icon">🔊</span>
-                <span class="sidebar-label">SOUND</span>
-            </button>
-            <button id="auth-btn" onclick="showAuthModal('login')" class="sidebar-btn sidebar-btn-auth">
-                <span class="sidebar-icon">▶</span>
-                <span id="auth-btn-label" class="sidebar-label">LOGIN</span>
-            </button>
-        </div>
-    </aside>
-    
-    <!-- Sidebar overlay for mobile -->
-    <div id="sidebar-overlay" class="sidebar-overlay hidden" onclick="closeSidebarMobile()"></div>
-    
-    <!-- Mobile top bar -->
-    <div class="mobile-topbar">
-        <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
-        <span class="mobile-title">MINI ARCADE</span>
-        <div style="width:40px"></div>
+<body>
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-icon">
+      <span></span><span></span><span></span><span></span>
     </div>
-    
-    <!-- Main content wrapper -->
-    <div class="main-content">
-        <div id="screen-home" class="screen max-w-6xl mx-auto px-8 py-16">
-            <div class="mb-16">
-                <h2 class="text-4xl font-bold mb-4">WELCOME TO GAMES HUB, <span id="player-name" class="text-[#00ff9d]">GUEST</span></h2>
-                <p class="text-zinc-500 text-xs tracking-widest">SELECT A GAME TO PLAY</p>
-            </div>
-
-            <div id="game-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div onclick="startGame('memory')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition"></div>
-                    <h3 class="text-lg font-bold mb-2">MEMORY</h3>
-                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Connect all same type pics.</p>
-                </div>
-                <div onclick="startGame('tictactoe')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition"></div>
-                    <h3 class="text-lg font-bold mb-2">TIC TAC</h3>
-                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">You will never win against my computer.</p>
-                </div>
-                <div onclick="startGame('reaction')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition" style="color:var(--neon);font-size:1.8rem"></div>
-                    <h3 class="text-lg font-bold mb-2">REACTION</h3>
-                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Test your speed reflexes.</p>
-                </div>
-                <div onclick="startGame('quiz')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition"></div>
-                    <h3 class="text-lg font-bold mb-2">QUIZ</h3>
-                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">10 Questions from web developing.</p>
-                </div>
-                <div onclick="startGame('snake')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition" style="color:var(--neon);font-size:1.6rem"></div>
-                    <h3 class="text-lg font-bold mb-2">SNAKE</h3>
-                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">The well known snake game.</p>
-                </div>
-                <div onclick="startGame('scramble')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition" style="font-size:1.6rem"></div>
-                    <h3 class="text-lg font-bold mb-2">SCRAMBLE</h3>
-                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Fix the word as soon as possible.</p>
-                </div>
-                <div onclick="startGame('numguess')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition" style="font-size:1.6rem"></div>
-                    <h3 class="text-lg font-bold mb-2">GUESS</h3>
-                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Guess the number.</p>
-                </div>
-                <div onclick="startGame('hangman')" class="game-card bg-zinc-900 border-2 border-zinc-800 p-8 rounded-3xl cursor-pointer group">
-                    <div class="game-card-icon text-5xl mb-6 group-hover:scale-110 transition" style="font-size:1.6rem"></div>
-                    <h3 class="text-lg font-bold mb-2">HANGMAN</h3>
-                    <p class="text-zinc-500 text-[0.6rem] leading-relaxed">Guess the word before the man is hanged.</p>
-                </div>
-            </div>
-
-            
-        </div>
-        
-        <div id="screen-game" class="screen hidden max-w-6xl mx-auto px-8 py-12">
-        <div class="flex items-center justify-between mb-12">
-            <button onclick="backToHome()" class="text-xs font-bold text-zinc-500 hover:text-white transition tracking-widest">← BACK TO MENU</button>
-            <h2 id="game-title" class="text-2xl font-bold tracking-widest text-[#00ff9d]">GAME</h2>
-            <div class="flex items-center gap-6">
-                <div class="text-right">
-     <div class="text-[0.5rem] text-zinc-500 mb-1">CURRENT SCORE</div>
-                    <div id="current-score" class="text-2xl font-bold">0</div>
-                </div>
-                <button onclick="saveMyScore()" class="px-6 py-3 bg-[#00ff9d] text-black rounded-2xl font-bold text-[0.6rem] hover:bg-white transition">SAVE SCORE</button>
-            </div>
-        </div>
-
-        <div id="game-memory" class="hidden max-w-2xl mx-auto">
-            <div class="flex justify-around mb-8 text-center text-xs">
-                <div class="bg-zinc-900 px-6 py-3 rounded-2xl">MOVES: <span id="mem-moves" class="text-[#00ff9d] font-bold">0</span></div>
-                <div class="bg-zinc-900 px-6 py-3 rounded-2xl">TIME: <span id="mem-timer" class="text-[#00ff9d] font-bold">0:00</span></div>
-                <div class="bg-zinc-900 px-6 py-3 rounded-2xl">PAIRS: <span id="mem-pairs" class="text-[#00ff9d] font-bold">0/8</span></div>
-            </div>
-            <div id="mem-grid" class="grid grid-cols-4 gap-4"></div>
-        </div>
-
-        <div id="game-tictactoe" class="hidden max-w-sm mx-auto text-center">
-            <div id="ttt-status" class="text-xs text-zinc-500 mb-6 tracking-widest">YOUR TURN (X)</div>
-            <div id="ttt-board" class="grid grid-cols-3 gap-3 mb-8"></div>
-            <button onclick="initTTT()" class="px-8 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-2xl text-[0.6rem] font-bold transition">RESTART GAME</button>
-        </div>
-
-        <div id="game-reaction" class="hidden max-w-xl mx-auto text-center">
-            <div id="reaction-best" class="text-xs text-zinc-500 mb-4">BEST: — ms</div>
-            <div id="reaction-display" onclick="handleReactionClick()" class="w-full aspect-square bg-zinc-900 rounded-3xl flex items-center justify-center cursor-pointer transition-colors border-4 border-zinc-800">
-        <div id="reaction-text" class="text-3xl font-bold">READY?</div>
-            </div>
-            <div id="reaction-results" class="grid grid-cols-5 gap-2 mt-8"></div>
-            <button id="reaction-start-btn" onclick="startReactionTest()" class="mt-8 px-12 py-4 bg-[#00ff9d] text-black rounded-3xl font-bold text-sm">START TEST</button>
-        </div>
-
-        <div id="game-quiz" class="hidden max-w-2xl mx-auto">
-            <div class="flex justify-between items-center mb-8">
-                <div class="text-xs text-zinc-500">QUESTION <span id="quiz-current" class="text-white">1</span>/10</div>
-                <div id="quiz-timer" class="text-xl font-bold text-[#00ff9d]">00:00</div>
-                <div id="quiz-score-display" class="text-xs text-zinc-500">SCORE: <span class="text-[#00ff9d]">0</span></div>
-            </div>
-            <div id="quiz-question" class="text-xl font-bold mb-8 leading-relaxed"></div>
-            <div id="quiz-options" class="space-y-3"></div>
-            <button id="quiz-next-btn" onclick="nextQuizQuestion()" class="hidden mt-8 w-full py-4 bg-white text-black rounded-3xl font-bold text-sm">NEXT QUESTION →</button>
-        </div>
-
-        <div id="game-snake" class="hidden max-w-xl mx-auto text-center">
-            <div class="flex justify-between mb-4 text-[0.6rem] text-zinc-500">
-                <div>SCORE: <span id="snake-score-display" class="text-white">0</span></div>
-                <div>BEST: <span id="snake-best-display" class="text-white">0</span></div>
-            </div>
-            <div class="relative inline-block">
-                <canvas id="snake-canvas" width="400" height="400" class="bg-zinc-900 rounded-2xl border-4 border-zinc-800"></canvas>
-                <div id="snake-overlay" class="absolute inset-0 bg-black/80 flex flex-col items-center justify-center rounded-2xl">
-                    <div id="snake-msg" class="text-xl font-bold mb-6">SNAKE</div>
-                    <button id="snake-start-btn" onclick="startSnake()" class="px-10 py-4 bg-[#00ff9d] text-black rounded-3xl font-bold text-xs">START</button>
-                </div>
-            </div>
-            <div class="mt-6 flex justify-center gap-4">
-                <div class="p-3 bg-zinc-900 rounded-xl border border-zinc-800 text-[0.5rem]">ARROWS TO MOVE</div>
-            </div>
-        </div>
-
-        <div id="game-scramble" class="hidden max-w-md mx-auto text-center">
-            <div class="flex justify-between mb-8 text-xs">
-                <div class="bg-zinc-900 px-4 py-2 rounded-xl">TIME: <span id="scramble-timer" class="text-[#00ff9d]">30</span>s</div>
-                <div class="bg-zinc-900 px-4 py-2 rounded-xl">SCORE: <span id="scramble-pts" class="text-[#00ff9d]">0</span></div>
-            </div>
-            <div id="scramble-word" class="text-5xl font-bold tracking-[0.3em] mb-4 text-[#00ff9d]">WORD</div>
-            <div id="scramble-hint" class="text-[0.6rem] text-zinc-500 mb-8 tracking-widest">HINT: —</div>
-            <input type="text" id="scramble-input" placeholder="TYPE ANSWER..."
-                   onkeydown="if(event.key==='Enter') checkScramble()"
-                   class="text-center text-xl mb-6" style="font-family:inherit">
-            <div id="scramble-feedback" class="h-4 text-xs mb-6"></div>
-            <button onclick="checkScramble()" class="w-full py-4 bg-[#00ff9d] text-black rounded-3xl font-bold text-sm">SUBMIT</button>
-        </div>
-
-        <div id="game-numguess" class="hidden max-w-md mx-auto text-center">
-            <div class="mb-8">
-                <div class="text-xs text-zinc-500 mb-2">ATTEMPTS LEFT</div>
-                <div id="numguess-lives" class="text-5xl font-bold text-[#00ff9d]">10</div>
-            </div>
-            <div id="numguess-hint" class="text-sm font-bold mb-8">GUESS A NUMBER (1–100)</div>
-            <div class="flex gap-3 justify-center mb-4">
-                <input type="number" id="numguess-input" min="1" max="100" placeholder="1–100"
-                       onkeydown="if(event.key==='Enter') submitGuess()"
-                       class="w-40 text-center text-2xl" style="font-family:inherit">
-                <button onclick="submitGuess()" class="px-8 py-3 bg-[#00ff9d] text-black rounded-3xl font-bold text-xs">GUESS</button>
-            </div>
-            <div id="numguess-history" class="flex flex-wrap gap-2 justify-center mt-4 max-h-32 overflow-y-auto"></div>
-            <div id="numguess-play-again" class="hidden mt-6">
-                <button onclick="initNumGuess()" class="px-12 py-4 bg-white text-black rounded-3xl font-bold text-sm">PLAY AGAIN</button>
-            </div>
-        </div>
-
-        <div id="game-hangman" class="hidden max-w-2xl mx-auto w-full">
-            <div class="flex gap-8 mb-6 justify-center text-center text-xs">
-                <div class="bg-zinc-900 px-4 py-2 rounded-2xl">LIVES: <span id="hm-lives" class="text-[#00ff9d] font-bold">6</span></div>
-                <div class="bg-zinc-900 px-4 py-2 rounded-2xl">CATEGORY: <span id="hm-category" class="text-[#00ff9d] font-bold">—</span></div>
-                <div class="bg-zinc-900 px-4 py-2 rounded-2xl">STREAK: <span id="hm-streak" class="text-[#00ff9d] font-bold">0</span></div>
-            </div>
-            <div class="flex justify-center mb-4">
-                <svg id="hm-svg" viewBox="0 0 200 220" width="180" height="180">
-                    <line x1="20" y1="210" x2="180" y2="210" stroke="#3f3f46" stroke-width="4" stroke-linecap="round"/>
-                    <line x1="60" y1="210" x2="60" y2="20" stroke="#3f3f46" stroke-width="4" stroke-linecap="round"/>
-                    <line x1="60" y1="20" x2="130" y2="20" stroke="#3f3f46" stroke-width="4" stroke-linecap="round"/>
-                    <line x1="130" y1="20" x2="130" y2="45" stroke="#3f3f46" stroke-width="4" stroke-linecap="round"/>
-                   
-                   
-                   
-                    <circle id="hm-head" cx="130" cy="60" r="15" stroke="#f43f5e" stroke-width="3" fill="none" class="hidden"/>
-                    
-                    
-                    <line id="hm-body" x1="130" y1="75" x2="130" y2="130" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" class="hidden"/>
-                    <line id="hm-larm" x1="130" y1="90" x2="105" y2="115" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" class="hidden"/>
-                    <line id="hm-rarm" x1="130" y1="90" x2="155" y2="115" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" class="hidden"/>
-                    <line id="hm-lleg" x1="130" y1="130" x2="105" y2="160" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" class="hidden"/>
-                    <line id="hm-rleg" x1="130" y1="130" x2="155" y2="160" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" class="hidden"/>
-                </svg>
-            </div>
-            <div id="hm-word" class="flex flex-wrap justify-center gap-3 mb-6 text-3xl font-bold tracking-widest"></div>
-            <div id="hm-hint" class="text-center text-xs text-zinc-500 mb-4"></div>
-            <div id="hm-keyboard" class="flex flex-wrap justify-center gap-2 mb-6"></div>
-            <div id="hm-result" class="hidden text-center">
-                <div id="hm-result-msg" class="text-2xl font-bold mb-2"></div>
-                <div id="hm-result-word" class="text-xs text-zinc-400 mb-4"></div>
-                <button onclick="initHangman()" class="px-12 py-4 bg-[#00ff9d] text-black rounded-3xl font-bold text-sm">NEXT WORD →</button>
-            </div>
-        </div>
+    MINI ARCADE
+  </div>
+  <div class="topbar-right">
+    <div class="score-pill">SCORE: <span id="current-score">0</span></div>
+    <div id="nav-user-pill" class="user-pill hidden"> <span id="nav-username">GUEST</span></div>
+    <button id="auth-btn" class="btn-top" onclick="window.showAuthModal('login')">LOGIN</button>
+  </div>
+</header>
+<section class="hero">
+  <h1>
+    <div class="line1">PLAY</div>
+    <div class="line2">18 GAMES</div>
+  </h1>
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="stat-val" id="home-total-games">--</div>
+      <div class="stat-lbl">Games Played</div>
     </div>
-    
-        <div id="screen-leaderboard" class="screen hidden">
-            <div class="lb-topbar">
-                <div class="lb-topbar-inner">
-                    <div class="lb-tabs">
-                        <button id="lb-tab-global" onclick="switchLBTab('global')" class="lb-tab active">GLOBAL</button>
-                        <button id="lb-tab-mine"   onclick="switchLBTab('mine')"   class="lb-tab">MY SCORES</button>
-                    </div>
-                    <div class="lb-game-pills">
-                        <button onclick="selectLBGame('global')"    id="lbg-global"    class="lb-game-btn active-pill">GLOBAL</button>
-                        <button onclick="selectLBGame('memory')"    id="lbg-memory"    class="lb-game-btn">MEMORY</button>
-                        <button onclick="selectLBGame('tictactoe')" id="lbg-tictactoe" class="lb-game-btn">TIC TAC</button>
-                        <button onclick="selectLBGame('reaction')"  id="lbg-reaction"  class="lb-game-btn">REACTION</button>
-                        <button onclick="selectLBGame('quiz')"      id="lbg-quiz"      class="lb-game-btn">QUIZ</button>
-                        <button onclick="selectLBGame('snake')"     id="lbg-snake"     class="lb-game-btn">SNAKE</button>
-                        <button onclick="selectLBGame('scramble')"  id="lbg-scramble"  class="lb-game-btn">SCRAMBLE</button>
-                        <button onclick="selectLBGame('numguess')"  id="lbg-numguess"  class="lb-game-btn">NUMGUESS</button>
-                        <button onclick="selectLBGame('hangman')"   id="lbg-hangman"   class="lb-game-btn">HANGMAN</button>
-                    </div>
-                </div>
-            </div>
-            <div class="px-8" style="padding-top:90px;padding-bottom:60px;max-width:680px;margin-left:0%;">
-                <h2 class="text-3xl font-bold mb-8">LEADERBOARD</h2>
-                <div id="lb-content">
-                    <div class="text-center py-12 text-zinc-500 text-xs">Loading scores...</div>
-                </div>
-            </div>
-        </div>
+    <div class="stat-box">
+      <div class="stat-val" id="home-high-score">--</div>
+      <div class="stat-lbl">Best Score</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" id="home-rank">--</div>
+      <div class="stat-lbl">Global Rank</div>
+    </div>
+  </div>
+</section>
 
-        <div id="screen-about" class="screen hidden">
-            <div class="max-w-2xl mx-auto px-8 py-16">
-                <h2 class="text-3xl font-bold mb-12">ABOUT</h2>
-                <div class="about-profile-card mb-8">
-                    <div class="about-avatar-big">SD</div>
-                    <div class="about-profile-info">
-                        <div class="about-name">SAVINDU DAMSARA</div>
-                        <div class="about-nick">aka <span style="color:var(--neon)">DREAMXHAVA</span></div>
-                    </div>
-                </div>
-                <div class="about-info-grid mb-8">
-                    <div class="about-info-row">
-                        <span class="about-info-label">AGE</span>
-                        <span class="about-info-val">--</span>
-                    </div>
-                    <div class="about-info-row">
-                        <span class="about-info-label">COUNTRY</span>
-                        <span class="about-info-val">SRI LANKA</span>
-                    </div>
-                    <div class="about-info-row">
-                        <span class="about-info-label">GITHUB</span>
-                        <a href="https://github.com/savindudam" target="_blank" class="about-info-link">savindudam</a>
-                    </div>
-                    <div class="about-info-row">
-                        <span class="about-info-label">INSTAGRAM</span>
-                        <a href="https://instagram.com/dreamxhava_2" target="_blank" class="about-info-link">@dreamxhava_2</a>
-                    </div>
-                </div>
-                <div class="about-desc-card">
-                    <p class="about-desc-text">Built this arcade as a personal project to practice web dev. All games are coded from scratch -- no game engines, just vanilla JS and a lot of trial and error.</p>
-                    <p class="about-desc-text" style="margin-top:1rem">If something is broken, hit Report Bug. If you have an idea, hit Suggest. I actually read them.</p>
-                </div>
-            </div>
-        </div>
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">ALL GAMES</div>
+    <div class="section-line"></div>
+  </div>
+  <div class="games-grid" id="games-grid">
 
-        <div id="screen-report" class="screen hidden">
-            <div class="form-screen-wrap">
-                <div class="form-screen-header">
-                    <div class="form-screen-tag">REPORT</div>
-                    <h2 class="form-screen-title">FOUND A BUG?</h2>
-                    <p class="form-screen-sub">Describe what broke and I will look into it.</p>
-                </div>
-                <div class="form-card">
-                    <div class="form-field">
-                        <label class="form-field-label">WHICH GAME</label>
-                        <select id="report-game" class="form-field-input">
-                            <option value="general">General / UI</option>
-                            <option value="memory">Memory</option>
-                            <option value="tictactoe">Tic Tac</option>
-                            <option value="reaction">Reaction</option>
-                            <option value="quiz">Quiz</option>
-                            <option value="snake">Snake</option>
-                            <option value="scramble">Scramble</option>
-                            <option value="numguess">Num Guess</option>
-                            <option value="hangman">Hangman</option>
-                            <option value="leaderboard">Leaderboard</option>
-                        </select>
-                    </div>
-                    <div class="form-field">
-                        <label class="form-field-label">DESCRIBE THE BUG</label>
-                        <textarea id="report-desc" class="form-field-input form-field-textarea" placeholder="What happened? What were you doing when it broke?"></textarea>
-                    </div>
-                    <div class="form-field-row">
-                        <label class="form-toggle-label">
-                            <input type="checkbox" id="report-anon" class="form-toggle-check">
-                            <span class="form-toggle-box"></span>
-                            <span class="form-toggle-text">SEND ANONYMOUSLY</span>
-                        </label>
-                    </div>
-                    <button onclick="submitReport()" class="form-submit-btn">SEND REPORT</button>
-                    <p id="report-status" class="form-status"></p>
-                </div>
-            </div>
-        </div>
-
-        <div id="screen-suggest" class="screen hidden">
-            <div class="form-screen-wrap">
-                <div class="form-screen-header">
-                    <div class="form-screen-tag">SUGGEST</div>
-                    <h2 class="form-screen-title">GOT AN IDEA?</h2>
-                    <p class="form-screen-sub">Tell me what game you want next. I actually read these.</p>
-                </div>
-                <div class="form-card">
-                    <div class="form-field">
-                        <label class="form-field-label">GAME NAME</label>
-                        <input type="text" id="suggest-name" class="form-field-input" placeholder="e.g. Minesweeper, Tetris, Wordle...">
-                    </div>
-                    <div class="form-field">
-                        <label class="form-field-label">DETAILS <span class="form-field-optional">OPTIONAL</span></label>
-                        <textarea id="suggest-desc" class="form-field-input form-field-textarea" placeholder="How should it work? Any special rules or ideas?"></textarea>
-                    </div>
-                    <div class="form-field-row">
-                        <label class="form-toggle-label">
-                            <input type="checkbox" id="suggest-anon" class="form-toggle-check">
-                            <span class="form-toggle-box"></span>
-                            <span class="form-toggle-text">SEND ANONYMOUSLY</span>
-                        </label>
-                    </div>
-                    <button onclick="submitSuggestion()" class="form-submit-btn">SEND SUGGESTION</button>
-                    <p id="suggest-status" class="form-status"></p>
-                </div>
-            </div>
-        </div>
-
-        <div id="screen-review" class="screen hidden">
-            <div class="form-screen-wrap">
-                <div class="form-screen-header">
-                    <div class="form-screen-tag">REVIEW</div>
-                    <h2 class="form-screen-title">LEAVE A REVIEW</h2>
-                    <p class="form-screen-sub">Let me know what you think. Good or bad.</p>
-                </div>
-                <div class="form-card">
-                    <div class="form-field">
-                        <label class="form-field-label">YOUR RATING</label>
-                        <div id="review-stars" class="form-stars">
-                            <button onclick="setReviewRating(1)" class="star-btn form-star">&#9733;</button>
-                            <button onclick="setReviewRating(2)" class="star-btn form-star">&#9733;</button>
-                            <button onclick="setReviewRating(3)" class="star-btn form-star">&#9733;</button>
-                            <button onclick="setReviewRating(4)" class="star-btn form-star">&#9733;</button>
-                            <button onclick="setReviewRating(5)" class="star-btn form-star">&#9733;</button>
-                        </div>
-                        <p id="review-rating-text" class="form-rating-hint">Click a star to rate</p>
-                    </div>
-                    <div class="form-field">
-                        <label class="form-field-label">FAVORITE GAME <span class="form-field-optional">OPTIONAL</span></label>
-                        <select id="review-game" class="form-field-input">
-                            <option value="">-- Select a game --</option>
-                            <option value="memory">Memory</option>
-                            <option value="tictactoe">Tic Tac</option>
-                            <option value="reaction">Reaction</option>
-                            <option value="quiz">Quiz</option>
-                            <option value="snake">Snake</option>
-                            <option value="scramble">Scramble</option>
-                            <option value="numguess">Num Guess</option>
-                            <option value="hangman">Hangman</option>
-                        </select>
-                    </div>
-                    <div class="form-field">
-                        <label class="form-field-label">YOUR REVIEW</label>
-                        <textarea id="review-text" class="form-field-input form-field-textarea" placeholder="What do you like? What could be better?"></textarea>
-                    </div>
-                    <div class="form-field-row">
-                        <label class="form-toggle-label">
-                            <input type="checkbox" id="review-anon" class="form-toggle-check">
-                            <span class="form-toggle-box"></span>
-                            <span class="form-toggle-text">SEND ANONYMOUSLY</span>
-                        </label>
-                    </div>
-                    <button onclick="submitReview()" class="form-submit-btn">SUBMIT REVIEW</button>
-                    <p id="review-status" class="form-status"></p>
-                </div>
-            </div>
-        </div>
-
-    <!-- End main-content wrapper -->
+    <div class="game-card" onclick="window.openGame('memory')">
+      <div class="game-card-glow"></div>
+      <div class="game-name">MEMORY</div>
+      <div class="game-desc">Flip cards and find matching pairs before time runs out</div>
+      <div class="game-tag tag-brain">BRAIN</div>
+      <div class="play-btn-overlay"><div class="play-btn-inner"> PLAY</div></div>
     </div>
 
-<div id="auth-modal" class="hidden fixed inset-0 bg-black/85 items-center justify-center z-[200]" style="display:none"
-         onclick="if(event.target.id==='auth-modal') hideAuthModal()">
-        <div class="modal-anim bg-zinc-900 w-full max-w-sm mx-4 rounded-3xl p-8 border-2 border-[#00ff9d]/30">
-            <div class="flex mb-8 bg-zinc-800 rounded-2xl p-1 gap-1">
-                <button id="tab-login"    onclick="switchTab('login')"    class="tab-btn active flex-1 py-3 rounded-xl text-xs font-bold transition">LOGIN</button>
-                <button id="tab-register" onclick="switchTab('register')" class="tab-btn flex-1 py-3 rounded-xl text-xs font-bold transition text-zinc-400">REGISTER</button>
-            </div>
-            <div id="field-name" class="hidden mb-4">
-                <label class="text-xs text-zinc-400 mb-2 block">DISPLAY NAME</label>
-                <input type="text" id="auth-name" placeholder="Your arcade name">
-            </div>
-            <div class="mb-4">
-                <label class="text-xs text-zinc-400 mb-2 block">EMAIL</label>
-                <input type="email" id="auth-email" placeholder="player@arcade.com">
-            </div>
-            <div class="mb-2">
-                <label class="text-xs text-zinc-400 mb-2 block">PASSWORD</label>
-                <input type="password" id="auth-pass" placeholder="••••••••"
-                       onkeydown="if(event.key==='Enter') currentAuthTab==='login'?fbLogin():fbRegister()">
-            </div>
-            <p id="auth-error" class="text-red-400 text-xs min-h-[1rem] mb-4"></p>
-            <button id="auth-submit-btn"
-                    onclick="currentAuthTab==='login'?fbLogin():fbRegister()"
-                    class="w-full py-4 bg-[#00ff9d] text-black rounded-2xl font-bold text-sm uppercase mb-4 hover:bg-white transition flex items-center justify-center gap-2">
-                <span id="auth-btn-text">LOGIN</span>
-                <span id="auth-spinner" class="hidden spin text-lg">⟳</span>
-            </button>
-            <div class="relative flex items-center gap-3 mb-4">
-                <div class="flex-1 h-px bg-zinc-700"></div>
-                <span class="text-xs text-zinc-500">OR</span>
-                <div class="flex-1 h-px bg-zinc-700"></div>
-            </div>
-            <button onclick="fbGoogleLogin()"
-                    class="w-full py-4 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-2xl font-bold text-xs uppercase transition flex items-center justify-center gap-3">
-                <svg class="w-5 h-5" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-                CONTINUE WITH GOOGLE
-            </button>
-            <button onclick="hideAuthModal()" class="mt-4 w-full py-3 text-xs text-zinc-500 hover:text-white transition">CANCEL</button>
-        </div>
+    <div class="game-card" onclick="window.openGame('tictactoe')">
+      <div class="game-card-glow"></div>
+      <div class="game-name">TIC-TAC-TOE</div>
+      <div class="game-desc">Classic X vs O — try to outwit the Computer opponent (You never gonna win)</div>
+      <div class="game-tag tag-brain">BRAIN</div>
+      <div class="play-btn-overlay"><div class="play-btn-inner"> PLAY</div></div>
     </div>
 
+    <div class="game-card" onclick="window.openGame('reaction')">
+      <div class="game-card-glow"></div>
+      <div class="game-name">REACTION</div>
+      <div class="game-desc">5 rounds — click the instant it turns green</div>
+      <div class="game-tag tag-reflex">REFLEX</div>
+      <div class="play-btn-overlay"><div class="play-btn-inner"> PLAY</div></div>
+    </div>
 
+    <div class="game-card" onclick="window.openGame('quiz')">
+      <div class="game-card-glow"></div>
+      <div class="game-name">QUIZ</div>
+      <div class="game-desc">10 coding & web dev trivia questions. Beat the clock</div>
+      <div class="game-tag tag-brain">BRAIN</div>
+      <div class="play-btn-overlay"><div class="play-btn-inner"> PLAY</div></div>
+    </div>
 
+    <div class="game-card" onclick="window.openGame('snake')">
+      <div class="game-card-glow"></div>
+      <div class="game-name">SNAKE</div>
+      <div class="game-desc">Eat food, grow longer, don't crash. Arrow keys to move</div>
+      <div class="game-tag tag-classic">CLASSIC</div>
+      <div class="play-btn-overlay"><div class="play-btn-inner"> PLAY</div></div>
+    </div>
 
+    <div class="game-card" onclick="window.openGame('scramble')">
+      <div class="game-card-glow"></div>
+      <div class="game-name">SCRAMBLE</div>
+      <div class="game-desc">Unscramble 8 tech words before the timer hits zero</div>
+      <div class="game-tag tag-brain">BRAIN</div>
+      <div class="play-btn-overlay"><div class="play-btn-inner"> PLAY</div></div>
+    </div>
 
+    <div class="game-card" onclick="window.openGame('numguess')">
+      <div class="game-card-glow"></div>
+      <div class="game-name">NUMBER GUESS</div>
+      <div class="game-desc">Guess 1–100 in 10 tries using hot/cold hints</div>
+      <div class="game-tag tag-puzzle">PUZZLE</div>
+      <div class="play-btn-overlay"><div class="play-btn-inner"> PLAY</div></div>
+    </div>
 
+    <div class="game-card" onclick="window.openGame('hangman')">
+      <div class="game-card-glow"></div>
+      <div class="game-name">HANGMAN</div>
+      <div class="game-desc">Guess the word letter by letter — 6 wrong and it's over</div>
+      <div class="game-tag tag-puzzle">PUZZLE</div>
+      <div class="play-btn-overlay"><div class="play-btn-inner"> PLAY</div></div>
+    </div>
 
+    <div class="game-card" onclick="window.openGame('tetris')">
+      <div class="game-card-glow"></div>
+      <div class="game-name">TETRIS</div>
+      <div class="game-desc">Stack and clear lines. Arrow keys to move and rotate</div>
+      <div class="game-tag tag-classic">CLASSIC</div>
+      <div class="play-btn-overlay"><div class="play-btn-inner"> PLAY</div></div>
+    </div>
 
+    <div class="game-card" onclick="window.openGame('minesweeper')">
+      <div class="game-card-glow"></div>
+      <div class="game-name">MINESWEEPER</div>
+      <div class="game-desc">Clear the grid without triggering any mines</div>
+      <div class="game-tag tag-puzzle">PUZZLE</div>
+      <div class="play-btn-overlay"><div class="play-btn-inner"> PLAY</div></div>
+    </div>
 
+    <div class="game-card" onclick="window.openGame('simon')">
+      <div class="game-card-glow"></div>
+      <div class="game-name">SIMON</div>
+      <div class="game-desc">Repeat the growing color sequence without mistakes</div>
+      <div class="game-tag tag-reflex">REFLEX</div>
+      <div class="play-btn-overlay"><div class="play-btn-inner"> PLAY</div></div>
+    </div>
 
+    <div class="game-card" onclick="window.openGame('2048')">
+      <div class="game-card-glow"></div>
+      <div class="game-name">2048</div>
+      <div class="game-desc">Slide and merge tiles to reach 2048. Arrow keys</div>
+      <div class="game-tag tag-puzzle">PUZZLE</div>
+      <div class="play-btn-overlay"><div class="play-btn-inner"> PLAY</div></div>
+    </div>
 
+    <div class="game-card" onclick="window.openGame('colormatch')">
+      <div class="game-card-glow"></div>
+      <div class="game-name">COLOR MATCH</div>
+      <div class="game-desc">Match the word, not the color — Stroop effect challenge</div>
+      <div class="game-tag tag-reflex">REFLEX</div>
+      <div class="play-btn-overlay"><div class="play-btn-inner"> PLAY</div></div>
+    </div>
 
+    <div class="game-card" onclick="window.openGame('flappy')">
+      <div class="game-card-glow"></div>
+      <div class="game-name">FLAPPY BIRD</div>
+      <div class="game-desc">Tap or press Space to flap through endless pipes</div>
+      <div class="game-tag tag-action">ACTION</div>
+      <div class="play-btn-overlay"><div class="play-btn-inner"> PLAY</div></div>
+    </div>
 
+    <div class="game-card" onclick="window.openGame('breakout')">
+      <div class="game-card-glow"></div>
+      <div class="game-name">BREAKOUT</div>
+      <div class="game-desc">Move your paddle with the mouse and smash all bricks</div>
+      <div class="game-tag tag-action">ACTION</div>
+      <div class="play-btn-overlay"><div class="play-btn-inner"> PLAY</div></div>
+    </div>
 
+    <div class="game-card" onclick="window.openGame('sudoku')">
+      <div class="game-card-glow"></div>
+      <div class="game-name">SUDOKU</div>
+      <div class="game-desc">Fill in every row, column, and box with 1–9</div>
+      <div class="game-tag tag-puzzle">PUZZLE</div>
+      <div class="play-btn-overlay"><div class="play-btn-inner"> PLAY</div></div>
+    </div>
 
+    <div class="game-card" onclick="window.openGame('whackamole')">
+      <div class="game-card-glow"></div>
+      <div class="game-name">WHACK-A-MOLE</div>
+      <div class="game-desc">Tap the glowing hole as fast as you can — don't miss!</div>
+      <div class="game-tag tag-reflex">REFLEX</div>
+      <div class="play-btn-overlay"><div class="play-btn-inner"> PLAY</div></div>
+    </div>
 
+    <div class="game-card" onclick="window.openGame('tower')">
+      <div class="game-card-glow"></div>
+      <div class="game-name">TOWER DEFENSE</div>
+      <div class="game-desc">Click to place towers and stop enemies reaching the end</div>
+      <div class="game-tag tag-action">ACTION</div>
+      <div class="play-btn-overlay"><div class="play-btn-inner"> PLAY</div></div>
+    </div>
 
-    <script src="scripts/main.js"></script>
-    <script src="games/memory.js"></script>
-    <script src="games/tictactoe.js"></script>
-    <script src="games/reaction.js"></script>
-    <script src="games/quiz.js"></script>
-    <script src="games/snake.js"></script>
-    <script src="games/scramble.js"></script>
-    <script src="games/numguess.js"></script>
-    <script src="games/hangman.js"></script>
-    <script type="module" src="firebase.js"></script>
+  </div>
+</div>
+<div class="lb-section">
+  <div class="section-header">
+    <div class="section-title"> LEADERBOARD</div>
+    <div class="section-line"></div>
+  </div>
+  <div class="lb-tabs" id="lb-tabs">
+    <button class="lb-tab active" onclick="window.switchLB('global', this)">GLOBAL</button>
+    <button class="lb-tab" onclick="window.switchLB('memory', this)">MEMORY</button>
+   <button class="lb-tab" onclick="window.switchLB('tictactoe', this)">TIC-TAC-TOE</button>
+    <button class="lb-tab" onclick="window.switchLB('reaction', this)">REACTION</button>
+    <button class="lb-tab" onclick="window.switchLB('quiz', this)">QUIZ</button>
+    <button class="lb-tab" onclick="window.switchLB('snake', this)">SNAKE</button>
+    <button class="lb-tab" onclick="window.switchLB('scramble', this)">SCRAMBLE</button>
+    <button class="lb-tab" onclick="window.switchLB('numguess', this)">NUM GUESS</button>
+    <button class="lb-tab" onclick="window.switchLB('hangman', this)">HANGMAN</button>
+    <button class="lb-tab" onclick="window.switchLB('tetris', this)">TETRIS</button>
+    <button class="lb-tab" onclick="window.switchLB('minesweeper', this)">MINESWEEPER</button>
+    <button class="lb-tab" onclick="window.switchLB('simon', this)">SIMON</button>
+    <button class="lb-tab" onclick="window.switchLB('2048', this)">2048</button>
+    <button class="lb-tab" onclick="window.switchLB('colormatch', this)">COLOR MATCH</button>
+    <button class="lb-tab" onclick="window.switchLB('flappy', this)">FLAPPY BIRD</button>
+    <button class="lb-tab" onclick="window.switchLB('breakout', this)">BREAKOUT</button>
+    <button class="lb-tab" onclick="window.switchLB('sudoku', this)">SUDOKU</button>
+    <button class="lb-tab" onclick="window.switchLB('whackamole', this)">WHACK-A-MOLE</button>
+    <button class="lb-tab" onclick="window.switchLB('tower', this)">TOWER DEFENSE</button>
+  </div>
+  <div class="lb-table-wrap">
+    <table class="lb-table">
+      <thead><tr><th>RANK</th><th>PLAYER</th><th>SCORE</th></tr></thead>
+      <tbody id="lb-tbody"><tr><td colspan="3" style="text-align:center;padding:32px;color:var(--muted);">Loading leaderboard...</td></tr></tbody>
+    </table>
+  </div>
+</div>
 
+<footer> MINI ARCADE </footer>
+<div class="modal-overlay" id="game-modal">
+  <div class="modal-box">
+    <div class="modal-topbar">
+      <div class="modal-gametitle" id="modal-game-title">GAME</div>
+      <div class="modal-score-area">
+        <div class="modal-score">SCORE: <span id="current-score-modal">0</span></div>
+        <button class="btn-save-score" onclick="window.saveScore()">SAVE SCORE</button>
+        <button class="btn-close-modal" onclick="window.closeGame()">✕</button>
+      </div>
+    </div>
+    <div class="modal-body" id="modal-body">
 
+      <div id="game-memory" class="hidden flex-col gap-12 w-full" style="align-items:center;">
+        <div style="display:flex;gap:24px;font-size:0.65rem;" class="game-stat">
+          <span>MOVES: <span id="mem-moves">0</span></span>
+          <span>PAIRS: <span id="mem-pairs">0/8</span></span>
+          <span>TIME: <span id="mem-timer">0:00</span></span>
+        </div>
+        <div class="mem-grid-wrap" id="mem-grid"></div>
+        <button class="game-btn" onclick="window.initMemoryGame()">NEW GAME</button>
+      </div>
+      <div id="game-tictactoe" class="hidden flex-col gap-16" style="align-items:center;width:100%;"></div>
+      <div id="game-reaction" class="hidden flex-col gap-12 w-full" style="align-items:center;">
+        <div id="reaction-display" style="background:var(--bg3);" onclick="window.handleReactionClick()">
+          <div id="reaction-text" style="font-family:var(--font-head);font-size:1rem;letter-spacing:0.15em;">READY?</div>
+        </div>
+        <div class="game-stat" id="reaction-best">BEST: — ms</div>
+        <div id="reaction-results" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;"></div>
+        <button id="reaction-start-btn" class="game-btn" onclick="window.startReactionTest()">START TEST</button>
+      </div>
+      <div id="game-quiz" class="hidden w-full" style="max-width:560px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:16px;" class="game-stat">
+          <span>Q <span id="quiz-current">1</span>/10</span>
+          <span id="quiz-timer">00:00</span>
+          <span id="quiz-score-display">SCORE: <span style="color:var(--neon)">0</span></span>
+        </div>
+        <div id="quiz-question" style="font-size:0.8rem;line-height:1.8;margin-bottom:20px;padding:16px;background:var(--bg3);border:1px solid var(--border);"></div>
+        <div id="quiz-options"></div>
+        <button id="quiz-next-btn" class="game-btn mt-16 hidden" onclick="window.nextQuizQuestion()">NEXT →</button>
+      </div>
 
+      <div id="game-snake" class="hidden flex-col gap-12" style="align-items:center;">
+        <div style="display:flex;gap:24px;" class="game-stat">
+          <span>SCORE: <span id="snake-score-display">0</span></span>
+          <span>BEST: <span id="snake-best-display">0</span></span>
+        </div>
+        <div style="position:relative;display:inline-block;">
+          <canvas id="snake-canvas" width="400" height="400"></canvas>
+          <div id="snake-overlay">
+            <div id="snake-msg" style="font-family:var(--font-head);font-size:0.7rem;color:var(--neon);letter-spacing:0.1em;">Press START to play</div>
+            <button id="snake-start-btn" class="game-btn" onclick="window.startSnake()">START</button>
+          </div>
+        </div>
+        <div class="game-stat">USE ARROW KEYS TO MOVE</div>
+      </div>
 
-<!-- 1- add games to the games folder and update ledger in the notepad to keep the track of it for the readme 
-        2- before shipping the project check for the enviroment variables -->
-       
+      <div id="game-scramble" class="hidden flex-col gap-12" style="align-items:center;width:100%;max-width:480px;">
+        <div style="display:flex;justify-content:space-between;width:100%;" class="game-stat">
+          <span>SCORE: <span id="scramble-pts">0</span></span>
+          <span>TIME: <span id="scramble-timer">30</span>s</span>
+        </div>
+        <div id="scramble-word" style="font-family:var(--font-head);font-size:2rem;letter-spacing:0.3em;color:var(--neon);margin-bottom:8px;" class="text-center"></div>
+        <div id="scramble-hint" class="game-stat text-center"></div>
+        <div style="display:flex;gap:8px;width:100%;justify-content:center;">
+          <input id="scramble-input" class="game-input" type="text" placeholder="TYPE ANSWER..." onkeydown="if(event.key==='Enter')window.checkScramble()">
+          <button class="game-btn" onclick="window.checkScramble()">GO</button>
+        </div>
+        <div id="scramble-feedback" style="font-family:var(--font-head);font-size:0.7rem;min-height:24px;"></div>
+      </div>
+      <div id="game-numguess" class="hidden flex-col gap-16" style="align-items:center;width:100%;max-width:400px;">
+        <div class="game-stat">LIVES: <span id="numguess-lives" style="color:var(--neon2);font-size:1rem;">10</span></div>
+        <div id="numguess-hint" class="text-center">GUESS A NUMBER (1–100)</div>
+        <div style="display:flex;gap:8px;width:100%;justify-content:center;">
+          <input id="numguess-input" class="game-input" type="number" min="1" max="100" placeholder="1–100" style="max-width:140px;" onkeydown="if(event.key==='Enter')window.submitGuess()">
+          <button class="game-btn" onclick="window.submitGuess()">GUESS</button>
+        </div>
+        <div id="numguess-history" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;"></div>
+        <button id="numguess-play-again" class="game-btn-sec hidden" onclick="window.initNumGuess()">PLAY AGAIN</button>
+      </div>
+      <div id="game-hangman" class="hidden flex-col gap-12" style="align-items:center;width:100%;">
+        <div style="display:flex;justify-content:space-between;width:100%;max-width:400px;" class="game-stat">
+          <span>LIVES: <span id="hm-lives" style="color:var(--neon2);">6</span></span>
+          <span id="hm-category"></span>
+        <span>STREAK: <span id="hm-streak" style="color:var(--neon);">0</span></span>
+        </div>
+        <svg width="140" height="140" viewBox="0 0 140 140">
+          <line x1="10" y1="130" x2="130" y2="130" stroke="var(--border)" stroke-width="3"/>
+          <line x1="35" y1="130" x2="35" y2="10" stroke="var(--border)" stroke-width="3"/>
+          <line x1="35" y1="10" x2="85" y2="10" stroke="var(--border)" stroke-width="3"/>
+          <line x1="85" y1="10" x2="85" y2="30" stroke="var(--border)" stroke-width="3"/>
+        <circle id="hm-head" cx="85" cy="42" r="12" fill="none" stroke="var(--neon2)" stroke-width="3"/>
+          <line id="hm-body" x1="85" y1="54" x2="85" y2="88" stroke="var(--neon2)" stroke-width="3"/>
+          <line id="hm-larm" x1="85" y1="64" x2="62" y2="78" stroke="var(--neon2)" stroke-width="3"/>
+          <line id="hm-rarm" x1="85" y1="64" x2="108" y2="78" stroke="var(--neon2)" stroke-width="3"/>
+          <line id="hm-lleg" x1="85" y1="88" x2="62" y2="112" stroke="var(--neon2)" stroke-width="3"/>
+          <line id="hm-rleg" x1="85" y1="88" x2="108" y2="112" stroke="var(--neon2)" stroke-width="3"/>
+        </svg>
+        <div class="game-stat" id="hm-hint"></div>
+        <div id="hm-word" style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;"></div>
+        <div id="hm-keyboard"></div>
+        <div id="hm-result" class="hidden flex-col gap-12 text-center" style="align-items:center;">
+          <div id="hm-result-msg" style="font-family:var(--font-head);font-size:0.9rem;"></div>
+          <div id="hm-result-word" class="game-stat"></div>
+          <button class="game-btn" onclick="window.initHangman()">PLAY AGAIN</button>
+        </div>
+      </div>
+
+      <div id="game-tetris" class="hidden flex-col gap-12" style="align-items:center;">
+        <div class="game-stat">USE ← → TO MOVE, ↓ TO DROP</div>
+        <canvas id="tetris-canvas" width="200" height="400"></canvas>
+      </div>
+
+      <div id="game-minesweeper" class="hidden flex-col gap-12" style="align-items:center;width:100%;">
+      </div>
+      <div id="game-simon" class="hidden flex-col gap-16" style="align-items:center;">
+        <div class="game-stat">WATCH THE SEQUENCE — THEN REPEAT IT</div>
+        <div id="simon-board"></div>
+        <div id="simon-status" class="game-stat" style="font-family:var(--font-head);letter-spacing:0.1em;"></div>
+      </div>
+
+      <div id="game-2048" class="hidden flex-col gap-12" style="align-items:center;">
+        <div class="game-stat">USE ARROW KEYS TO SLIDE TILES</div>
+        <div id="grid-2048"></div>
+      </div>
+
+      <div id="game-colormatch" class="hidden flex-col gap-12" style="align-items:center;">
+        <div class="game-stat">CLICK THE BUTTON MATCHING THE WORD TEXT — NOT THE COLOR</div>
+      </div>
+
+      <div id="game-flappy" class="hidden flex-col gap-12" style="align-items:center;">
+        <div class="game-stat">CLICK OR PRESS SPACE TO FLAP</div>
+        <canvas id="flappy-canvas" width="320" height="480"></canvas>
+      </div>
+
+      <div id="game-breakout" class="hidden flex-col gap-12" style="align-items:center;">
+        <div class="game-stat">MOVE MOUSE TO CONTROL PADDLE</div>
+        <canvas id="breakout-canvas" width="400" height="300"></canvas>
+      </div>
+      <div id="game-sudoku" class="hidden flex-col gap-12" style="align-items:center;width:100%;">
+        <div class="game-stat">FILL EACH ROW, COLUMN AND 3×3 BOX WITH 1–9</div>
+        <div id="sudoku-grid"></div>
+      </div>
+
+      <div id="game-whackamole" class="hidden flex-col gap-12" style="align-items:center;width:100%;">
+        <div class="game-stat">HIT THE GLOWING HOLE!</div>
+      </div>
+      <div id="game-tower" class="hidden flex-col gap-12" style="align-items:center;width:100%;">
+        <div class="game-stat">CLICK TO PLACE TOWERS — STOP ENEMIES REACHING THE RIGHT SIDE</div>
+        <canvas id="tower-canvas" width="500" height="300"></canvas>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="auth-overlay" id="auth-modal">
+  <div class="auth-box">
+    <button class="btn-close-auth" onclick="window.hideAuthModal()">✕</button>
+    
+    <div id="auth-login-form">
+      <div class="auth-title">LOGIN</div>
+     <input type="email" id="auth-email" class="auth-input" placeholder="EMAIL">
+      <input type="password" id="auth-pass" class="auth-input" placeholder="PASSWORD">
+      <div class="auth-err" id="auth-error"></div>
+      <button class="auth-btn" onclick="window.fbLogin()" id="login-submit-btn">LOGIN</button>
+      <div class="auth-divider">OR</div>
+      <button class="auth-btn auth-btn-sec" onclick="window.fbGoogleLogin()" id="google-login-btn">GOOGLE SIGN IN</button>
+      <div class="auth-switch">NEW PLAYER? <button onclick="window.showAuthModal('register')">SIGN UP</button></div>
+    </div>
+
+    <div id="auth-register-form" class="hidden">
+      <div class="auth-title">SIGN UP</div>
+      <input type="text" id="auth-name" class="auth-input" placeholder="DISPLAY NAME">
+      <input type="email" id="auth-email-reg" class="auth-input" placeholder="EMAIL">
+      <input type="password" id="auth-pass-reg" class="auth-input" placeholder="PASSWORD">
+      <div class="auth-err" id="auth-error-reg"></div>
+      <button class="auth-btn" onclick="window.fbRegister()" id="register-submit-btn">CREATE ACCOUNT</button>
+      <div class="auth-divider">OR</div>
+      <button class="auth-btn auth-btn-sec" onclick="window.fbGoogleLogin()" id="google-register-btn">GOOGLE SIGN IN</button>
+      <div class="auth-switch">HAVE ACCOUNT? <button onclick="window.showAuthModal('login')">LOGIN</button></div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="firebase.js"></script>
+<script src="games/memory.js"></script>
+<script src="games/tictactoe.js"></script>
+<script src="games/reaction.js"></script>
+<script src="games/quiz.js"></script>
+<script src="games/snake.js"></script>
+<script src="games/scramble.js"></script>
+<script src="games/numguess.js"></script>
+<script src="games/hangman.js"></script>
+<script src="games/tetris.js"></script>
+<script src="games/minesweeper.js"></script>
+<script src="games/simon.js"></script>
+<script src="games/game2048.js"></script>
+<script src="games/colormatch.js"></script>
+<script src="games/flappy.js"></script>
+<script src="games/breakout.js"></script>
+<script src="games/sudoku.js"></script>
+<script src="games/whackamole.js"></script>
+<script src="games/tower.js"></script>
+
+<script>
+const GAME_META = {
+  memory:      { title: 'MEMORY',         init: () => window.initMemoryGame() },
+  tictactoe:   { title: 'TIC-TAC-TOE',    init: () => window.initTicTacToe() },
+  reaction:    { title: 'REACTION TEST',   init: () => window.initReactionGame() },
+  quiz:        { title: 'QUIZ',            init: () => window.initQuizGame() },
+  snake:       { title: 'SNAKE',           init: () => window.initSnake() },
+  scramble:    { title: 'WORD SCRAMBLE',   init: () => window.initScramble() },
+  numguess:    { title: 'NUMBER GUESS',    init: () => window.initNumGuess() },
+  hangman:     { title: 'HANGMAN',         init: () => window.initHangman() },
+  tetris:      { title: 'TETRIS',          init: () => window.initTetris() },
+  minesweeper: { title: 'MINESWEEPER',     init: () => window.initMinesweeper() },
+  simon:       { title: 'SIMON SAYS',      init: () => window.initSimon() },
+  '2048':      { title: '2048',            init: () => window.init2048() },
+  colormatch:  { title: 'COLOR MATCH',     init: () => window.initColorMatch() },
+  flappy:      { title: 'FLAPPY BIRD',     init: () => window.initFlappy() },
+  breakout:    { title: 'BREAKOUT',        init: () => window.initBreakout() },
+  sudoku:      { title: 'SUDOKU',          init: () => window.initSudoku() },
+  whackamole:  { title: 'WHACK-A-MOLE',   init: () => window.initWhackAMole() },
+  tower:       { title: 'TOWER DEFENSE',   init: () => window.initTower() },
+};
+
+const ALL_GAME_IDS = Object.keys(GAME_META);
+window.currentGame = null;
+window.currentScore = 0;
+window.leaderboardData = {};
+
+function stopAllIntervals() {
+  ['tetrisInterval','snakeInterval','flappyInterval','breakoutInterval',
+   'towerInterval','memTimerInterval','quizTimerInterval','scrambleInterval',
+   'moleTimeout','reactionTimeout'].forEach(k => {
+    if (window[k]) { clearInterval(window[k]); clearTimeout(window[k]); window[k] = null; }
+  });
+  if (window._tetrisKeyHandler) { window.removeEventListener('keydown', window._tetrisKeyHandler); window._tetrisKeyHandler = null; }
+  if (window._2048KeyHandler) { window.removeEventListener('keydown', window._2048KeyHandler); window._2048KeyHandler = null; }
+  if (window._flappyKeyHandler) { window.removeEventListener('keydown', window._flappyKeyHandler); window._flappyKeyHandler = null; }
+}
+
+window.openGame = function(gameId) {
+  stopAllIntervals();
+  window.currentGame = gameId;
+  window.currentScore = 0;
+  document.getElementById('current-score-modal').textContent = '0';
+  document.getElementById('current-score').textContent = '0';
+
+  const meta = GAME_META[gameId];
+  document.getElementById('modal-game-title').textContent = meta.title;
+
+  ALL_GAME_IDS.forEach(id => {
+    const el = document.getElementById('game-' + id);
+    if (el) el.classList.add('hidden');
+  });
+  const el2048 = document.getElementById('game-2048');
+  if (el2048) el2048.classList.add('hidden');
+
+  const gameEl = document.getElementById('game-' + gameId);
+  if (gameEl) gameEl.classList.remove('hidden');
+
+  document.getElementById('game-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  setTimeout(() => {
+    try { meta.init(); } catch(e) { console.error('Init error for', gameId, e); }
+  }, 80);
+};
+
+window.closeGame = function() {
+  stopAllIntervals();
+  document.getElementById('game-modal').classList.remove('open');
+  document.body.style.overflow = '';
+  window.currentGame = null;
+};
+
+window.updateCurrentScore = function(score) {
+  window.currentScore = score;
+  document.getElementById('current-score-modal').textContent = score;
+  document.getElementById('current-score').textContent = score;
+};
+
+window.saveScore = async function() {
+  if (!window.currentGame || !window.currentScore) return;
+  const saved = await window.fbSaveScore(window.currentGame, window.currentScore);
+  if (saved) {
+    alert('Score saved! 🏆');
+    loadLeaderboard();
+  }
+};
+
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+window.playSound = function(type) {
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    const t = audioCtx.currentTime;
+    if (type === 'click') {
+      osc.frequency.value = 220; gain.gain.setValueAtTime(0.08, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.08);
+      osc.start(t); osc.stop(t + 0.08);
+    } else if (type === 'match') {
+      osc.frequency.value = 440; gain.gain.setValueAtTime(0.12, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.18);
+      osc.start(t); osc.stop(t + 0.18);
+    } else if (type === 'win') {
+      osc.frequency.value = 660; gain.gain.setValueAtTime(0.15, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.35);
+      osc.start(t); osc.stop(t + 0.35);
+    }
+  } catch(e) {}
+};
+
+window.currentLBGame = 'global';
+
+async function loadLeaderboard() {
+  try {
+    window.leaderboardData = await window.fbLoadLeaderboard();
+    renderLB();
+  } catch(e) {}
+}
+
+window.switchLB = function(game, btn) {
+  window.currentLBGame = game;
+  document.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderLB();
+};
+
+function renderLB() {
+  const data = window.leaderboardData[window.currentLBGame] || [];
+  const tbody = document.getElementById('lb-tbody');
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:32px;color:var(--muted);">No scores yet — be the first!</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map((p, i) => {
+    const cls = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : '';
+    return `<tr><td><span class="rank-num ${cls}">${i+1}</span></td><td>${p.displayName||'ANON'}</td><td style="color:var(--neon);font-family:var(--font-head);">${p.score||0}</td></tr>`;
+  }).join('');
+}
+
+async function loadHomeStats() {
+  const user = window._currentUser;
+  if (!user) return;
+  try {
+    const my = await window.fbLoadMyScores();
+    const g = my.global && my.global[0];
+    if (g) {
+      document.getElementById('home-total-games').textContent = g.gamesPlayed || 0;
+      document.getElementById('home-high-score').textContent = g.score || 0;
+    }
+    const lb = await window.fbLoadLeaderboard();
+    const rank = lb.global.findIndex(p => p.uid === user.uid);
+    document.getElementById('home-rank').textContent = rank >= 0 ? '#' + (rank+1) : '--';
+  } catch(e) {}
+}
+
+window.showAuthModal = function(mode) {
+  document.getElementById('auth-modal').classList.add('open');
+  const login = document.getElementById('auth-login-form');
+  const reg = document.getElementById('auth-register-form');
+  document.getElementById('auth-error').textContent = '';
+  const regErr = document.getElementById('auth-error-reg');
+  if (regErr) regErr.textContent = '';
+  if (mode === 'login') {
+    login.classList.remove('hidden');
+    reg.classList.add('hidden');
+  } else {
+    login.classList.add('hidden');
+    reg.classList.remove('hidden');
+  }
+};
+
+window.hideAuthModal = function() {
+  document.getElementById('auth-modal').classList.remove('open');
+};
+
+window.setAuthLoading = function(loading) {
+  ['login-submit-btn','google-login-btn','register-submit-btn','google-register-btn'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.disabled = loading;
+  });
+};
+
+const _origOnAuth = window._onAuthStateChanged;
+setTimeout(() => {
+  const authBtn = document.getElementById('auth-btn');
+  const pill = document.getElementById('nav-user-pill');
+  function updateAuthUI(user) {
+    if (user) {
+      const name = (user.displayName || user.email.split('@')[0]).toUpperCase();
+      document.getElementById('nav-username').textContent = name;
+      pill.classList.remove('hidden');
+      authBtn.textContent = 'LOGOUT';
+      authBtn.onclick = window.fbLogout;
+      loadHomeStats();
+    } else {
+      pill.classList.add('hidden');
+      authBtn.textContent = 'LOGIN';
+      authBtn.onclick = () => window.showAuthModal('login');
+    }
+  }
+  const checkUser = setInterval(() => {
+    updateAuthUI(window._currentUser);
+  }, 500);
+  setTimeout(() => clearInterval(checkUser), 10000);
+}, 200);
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+ window.closeGame();
+    window.hideAuthModal();
+  }
+});
+
+const _origInitColorMatch = null;
+
+window.addEventListener('load', () => {
+  setTimeout(loadLeaderboard, 1500);
+});
+</script>
 </body>
 </html>

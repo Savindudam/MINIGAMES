@@ -1,69 +1,88 @@
-let reactionTimes = [], reactionStart = 0, waitingForClick = false;
+window.initTicTacToe = function() {
+    const container = document.getElementById('game-tictactoe');
+    let board = Array(9).fill(null);
+    let playerTurn = true;
+    let gameOver = false;
 
-window.initReactionGame = function() {
-    reactionTimes = [];
-    document.getElementById('reaction-results').innerHTML = '';
-    document.getElementById('reaction-best').textContent = 'BEST: --- ms';
-    document.getElementById('reaction-display').style.backgroundColor = '#27272a';
-    document.getElementById('reaction-text').textContent = 'READY?';
-    document.getElementById('reaction-start-btn').classList.remove('hidden');
-    document.getElementById('reaction-start-btn').textContent = 'START TEST';
-    document.getElementById('reaction-start-btn').onclick = window.startReactionTest;
+    function render() {
+        container.innerHTML = `
+        <div style="text-align:center; margin-bottom:16px; font-size:0.6rem; color:var(--muted); font-family:var(--font-head); letter-spacing:0.1em;" id="ttt-status">YOUR TURN (X)</div>
+        <div id="ttt-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; width:100%; max-width:280px; margin:0 auto;"></div>
+        <button class="game-btn" onclick="window.initTicTacToe()" style="margin-top:20px; display:block; margin-left:auto; margin-right:auto;">NEW GAME</button>
+    `;
+        const grid = document.getElementById('ttt-grid');
+        board.forEach((cell, i) => {
+            const btn = document.createElement('button');
+            btn.style.cssText = 'width:100%; aspect-ratio:1; background:var(--card); border:2px solid var(--border); font-family:var(--font-head),system-ui; font-size:1.8rem; cursor:pointer; color:' + (cell === 'X' ? 'var(--neon)' : '#f43f5e');
+            btn.textContent = cell || '';
+            btn.onclick = () => playerMove(i);
+            grid.appendChild(btn);
+        });
+    }
+
+    function checkWinner(b) {
+        const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+        for (const [a,c,d] of lines) {
+            if (b[a] && b[a] === b[c] && b[a] === b[d]) return b[a];
+        }
+        return b.every(Boolean) ? 'draw' : null;
+    }
+
+    function playerMove(i) {
+        if (!playerTurn || gameOver || board[i]) return;
+        board[i] = 'X';
+        playerTurn = false;
+        const result = checkWinner(board);
+        render();
+        if (result) { endGame(result); return; }
+        document.getElementById('ttt-status').textContent = 'COMPUTER THINKING...';
+        setTimeout(aiMove, 400);
+    }
+
+    function aiMove() {
+        // Try to win, then block, then center, then random
+        const empty = board.map((v,i) => v === null ? i : null).filter(v => v !== null);
+        const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+        function findBest(mark) {
+            for (const [a,b,c] of lines) {
+                const cells = [board[a],board[b],board[c]];
+                if (cells.filter(v=>v===mark).length===2 && cells.includes(null)) {
+                    return [a,b,c][cells.indexOf(null)];
+                }
+            }
+            return null;
+        }
+
+        let move = findBest('O') ?? findBest('X');
+        if (move === null) move = board[4] === null ? 4 : empty[Math.floor(Math.random()*empty.length)];
+
+        board[move] = 'O';
+        playerTurn = true;
+        const result = checkWinner(board);
+        render();
+        if (result) endGame(result);
+    }
+
+    function endGame(result) {
+        gameOver = true;
+        const status = document.getElementById('ttt-status');
+        if (result === 'X') {
+            status.textContent = 'YOU WIN!';
+            status.style.color = '#00ff9d';
+            window.updateCurrentScore(100);
+            window.playSound('win');
+        } else if (result === 'O') {
+            status.textContent = 'COMPUTER WINS!';
+            status.style.color = '#f43f5e';
+            window.playSound('click');
+        } else {
+            status.textContent = "DRAW!";
+            status.style.color = 'var(--text-muted)';
+            window.updateCurrentScore(50);
+        }
+    }
+
+    render();
     window.updateCurrentScore(0);
 };
-
-window.startReactionTest = function() {
-    document.getElementById('reaction-start-btn').classList.add('hidden');
-    reactionTimes = [];
-    document.getElementById('reaction-results').innerHTML = '';
-    nextReactionRound();
-};
-
-function nextReactionRound() {
-    if (reactionTimes.length >= 5) { finishReactionTest(); return; }
-    waitingForClick = false;
-    document.getElementById('reaction-display').style.backgroundColor = '#27272a';
-    document.getElementById('reaction-text').textContent = 'ROUND ' + (reactionTimes.length + 1) + ' --- WAIT...';
-    window.reactionTimeout = setTimeout(() => {
-        waitingForClick = true; reactionStart = Date.now();
-        document.getElementById('reaction-display').style.backgroundColor = '#00ff9d';
-        document.getElementById('reaction-text').innerHTML = '<span style="color:#000">CLICK!</span>';
-        window.playSound('click');
-    }, Math.random() * 3300 + 1200);
-}
-
-window.handleReactionClick = function() {
-    if (!waitingForClick) {
-        clearTimeout(window.reactionTimeout);
-        document.getElementById('reaction-display').style.backgroundColor = '#f43f5e';
-        document.getElementById('reaction-text').textContent = 'TOO EARLY!';
-        reactionTimes.push(999);
-        setTimeout(nextReactionRound, 1200);
-        return;
-    }
-    const t = Date.now() - reactionStart; waitingForClick = false;
-    reactionTimes.push(t);
-    document.getElementById('reaction-display').style.backgroundColor = '#27272a';
-    document.getElementById('reaction-text').textContent = t + 'ms';
-    const el = document.createElement('div');
-    el.className = 'px-4 py-2 bg-zinc-800 rounded-2xl text-center';
-    el.innerHTML = '<div class="text-xs text-zinc-400">R' + reactionTimes.length + '</div><div class="text-2xl font-bold">' + t + '</div>';
-    document.getElementById('reaction-results').appendChild(el);
-    const best = Math.min(...reactionTimes);
-    document.getElementById('reaction-best').textContent = 'BEST: ' + best + 'ms';
-    window.updateCurrentScore(Math.max(0, 800 - best));
-    setTimeout(nextReactionRound, 900);
-};
-
-function finishReactionTest() {
-    const valid = reactionTimes.filter(t => t < 999);
-    const avg = valid.length
-        ? Math.round(valid.reduce((a, b) => a + b, 0) / valid.length)
-        : 0;
-    document.getElementById('reaction-text').innerHTML = 'AVG<br><span class="text-5xl">' + avg + 'ms</span>';
-    const btn = document.getElementById('reaction-start-btn');
-    btn.textContent = 'PLAY AGAIN';
-    btn.onclick = window.initReactionGame;
-    btn.classList.remove('hidden');
-    window.playSound('win');
-}

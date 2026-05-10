@@ -13,6 +13,7 @@ window.initNumGuess = function() {
 
 
 
+
 window.submitGuess = function() {
     if (ngOver) return;
     const val = parseInt(document.getElementById('numguess-input').value);
@@ -35,7 +36,7 @@ window.submitGuess = function() {
         document.getElementById('numguess-hint').textContent = `GAME OVER! IT WAS ${ngTarget}`;
         document.getElementById('numguess-play-again').classList.remove('hidden');
     } else {
-        document.getElementById('numguess-hint').textContent = val < ngTarget ? 'HIGHER! ⬆️' : 'LOWER! ⬇️';
+        document.getElementById('numguess-hint').textContent = val < ngTarget ? 'HIGHER! ' : 'LOWER! ';
         window.playSound('click');
     }
     document.getElementById('numguess-input').value = '';

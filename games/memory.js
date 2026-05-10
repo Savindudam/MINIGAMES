@@ -10,10 +10,10 @@ window.initMemoryGame = function() {
     document.getElementById('mem-timer').textContent = '0:00';
     const grid = document.getElementById('mem-grid');
     grid.innerHTML = memCards.map((icon, i) => `
-        <div class="flip-card aspect-square cursor-pointer" onclick="flipMemCard(this, ${i})">
-            <div class="flip-card-inner relative w-full h-full">
-         <div class="flip-card-front absolute inset-0 bg-zinc-800 rounded-2xl border-2 border-zinc-700 flex items-center justify-center text-2xl">?</div>
-                <div class="flip-card-back absolute inset-0 bg-[#00ff9d] rounded-2xl flex items-center justify-center text-4xl">${icon}</div>
+        <div class="flip-card" onclick="flipMemCard(this, ${i})" style="aspect-ratio:1;cursor:pointer;perspective:800px;">
+            <div class="flip-card-inner" style="position:relative;width:100%;height:100%;transition:transform 0.35s;transform-style:preserve-3d;">
+                <div class="flip-card-front" style="position:absolute;inset:0;background:var(--bg3);border:1px solid var(--border);border-radius:8px;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:1.2rem;color:var(--muted);">?</div>
+                <div class="flip-card-back" style="position:absolute;inset:0;background:rgba(0,255,157,0.12);border:1px solid rgba(0,255,157,0.3);border-radius:8px;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;font-size:2rem;transform:rotateY(180deg);">${icon}</div>
             </div>
         </div>`).join('');
     if (window.memTimerInterval) clearInterval(window.memTimerInterval);
@@ -47,7 +47,7 @@ if (memFlipped.length === 2) {
                 window.playSound('win');
             }
         } else {
-            setTimeout(() => {
+    setTimeout(() => {
                 c1.el.classList.remove('flipped');
                 c2.el.classList.remove('flipped');
                 memFlipped = []; memLocked = false;

@@ -87,10 +87,3 @@ And this was the buggiest update I had ever did to this project. Since it was li
 
 
 ---
-
-<img width="1920" height="939" alt="image" src="https://github.com/user-attachments/assets/0601c64f-798c-46d1-a779-606514848b8d" />
-
-<img width="1920" height="939" alt="image" src="https://github.com/user-attachments/assets/8d0c0ab9-9360-4750-87d4-f8b5b8c3e2c9" />
-
-
-

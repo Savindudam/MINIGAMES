@@ -11,6 +11,11 @@ const quizQuestions = [
     {q:"Event delegation is useful because...",a:["Less memory","Faster code","Allows dynamic elements","All of the above"],correct:3}
 ];
 
+
+
+
+
+
 let quizIndex = 0, quizScore = 0, quizSeconds = 0;
 
 window.initQuizGame = function() {
@@ -32,7 +37,10 @@ function loadQuizQuestion() {
     document.getElementById('quiz-question').textContent = q.q;
     document.getElementById('quiz-options').innerHTML = q.a.map((opt, i) => `
         <button onclick="selectQuizAnswer(${i})"
-                class="quiz-option w-full text-left px-6 py-5 bg-zinc-800 hover:bg-zinc-700 rounded-3xl text-sm transition">
+                style="width:100%;text-align:left;padding:14px 18px;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:0.75rem;cursor:pointer;margin-bottom:8px;transition:border-color 0.15s;"
+                onmouseenter="if(!this.disabled)this.style.borderColor='var(--neon)'"
+                onmouseleave="if(!this.disabled)this.style.borderColor='var(--border)'"
+                class="quiz-opt">
             ${String.fromCharCode(65 + i)}. ${opt}
         </button>`).join('');
     document.getElementById('quiz-next-btn').classList.add('hidden');
@@ -40,7 +48,7 @@ function loadQuizQuestion() {
 
 window.selectQuizAnswer = function(choice) {
     const correct = quizQuestions[quizIndex].correct;
-    document.querySelectorAll('.quiz-option').forEach((btn, i) => {
+    document.querySelectorAll('.quiz-opt').forEach((btn, i) => {
         btn.disabled = true;
         if (i === correct) { btn.style.background = '#00ff9d'; btn.style.color = '#000'; }
         if (i === choice && i !== correct) btn.style.background = '#f43f5e';
@@ -66,7 +74,7 @@ function finishQuiz() {
             <div class="text-3xl font-bold">QUIZ COMPLETE!</div>
             <div class="text-6xl mt-6 text-[#00ff9d]">${final} PTS</div>
             <div class="text-sm mt-4 text-zinc-400">Time: ${document.getElementById('quiz-timer').textContent}</div>
-            <button onclick="initQuizGame()" class="mt-8 px-12 py-4 bg-white text-black text-lg rounded-3xl">PLAY AGAIN</button>
+            <button onclick="initQuizGame()" class="game-btn" style="margin-top:32px;padding:14px 40px;font-size:0.85rem;">PLAY AGAIN</button>
         </div>`;
     document.getElementById('quiz-options').innerHTML = '';
     document.getElementById('quiz-next-btn').classList.add('hidden');
