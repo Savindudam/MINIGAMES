@@ -87,3 +87,20 @@ And this was the buggiest update I had ever did to this project. Since it was li
 
 
 ---
+
+## Version 1.4 update 
+-The site was basically broken last time since i made a wrong commitment in between the updates and it was synced accidently. And the new files weren't added there but the time was recorded so i added the files without recording time again.
+
+  1. The UI is changed because everyone haates the neone theme.
+  2. There was some games made by me for fun I maded some little changes on it and added them here so now there are 18 games.
+  3. Leaderboard is functioning correctly now my auth was also wrong with the last sync.
+  4. All the bugs are fixed.
+
+Enjoy the site guys 
+
+---
+
+### Some screenshots
+
+<img width="1920" height="939" alt="image" src="screenshot.png">
+<img width="1920" height="939" alt="image" src="screenshot2.png>
