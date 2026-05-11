@@ -103,4 +103,4 @@ Enjoy the site guys
 ### Some screenshots
 
 <img width="1920" height="939" alt="image" src="screenshot.png">
-<img width="1920" height="939" alt="image" src="screenshot2.png>
+<img width="1920" height="939" alt="image" src="screenshot2.png">
