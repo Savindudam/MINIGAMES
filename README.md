@@ -1,106 +1,83 @@
-# MINI ARCADE V1
+# Mini Arcade V1
 
-Mini Arcade V1 - this is my first attempt at building a browser-based arcade with multiple classic games. 
-
----
-
-# IMPORTANT NOTICE 
-
-Before playing any games just create an account or else your progress will be lost.
+okay so this is my first attempt at making a broswer based arcade with mutiple classic games all in one place. built it completly from scratch and im actually pretty proud of how it turned out.
 
 ---
 
-## What This Project Is All About
-I built Mini Arcade V1 as a complete, ready-to-play web experience that combines entertainment with practical web development techniques. It’s designed to be:
-
-Right now in V1 you get four games:
-- Memory Match – flip cards and test your brain
-- Tic Tac Toe – battle a Computer (easy or challenging mode)
-- Reaction Time Tester – how fast are your reflexes?
-- Web Dev Quiz – 10 questions that actually test real JavaScript & web knowledge
+## pleease make an acount before jumping into any game or your progres wont be saved.
 
 ---
 
-## How I Built It (Tech Stuff – Made Simple)
+## what is this thing
 
-| Technology              | Why I Used It |
-|-------------------------|---------------|
-| HTML5 + CSS3            | Clean structure and those sweet 3D card flips |
-| Tailwind CSS            | Fast, beautiful styling without writing 1000 lines of CSS |
-| Vanilla JavaScript      | All the game logic, timers, scoring - powerful and framework-free |
-| Web Audio API           | Fun little beeps and win sounds (no extra files needed) |
-| CSS Animations          | Smooth transitions and that arcade “pop” feeling |
+i built Mini Arcade V1 as a full ready-to-play web exprience. the idea was to make somthing fun but also show off some actual web dev skills at the same time.
 
-Core web dev concepts I showed off in V1:
-- Event-driven programming
-- Dynamic DOM updates
-- State management for each game
-- Timing systems and win detection
-- Modular code (even though it’s one file right now)
+**v1 launched with 4 games:**
+- Memory Match  flip cards, test your memroy, classic stuff
+- Tic Tac Toe  you vs the computer, easy or hard mode
+- Reaction Time Tester  see how fast your reflexes actualy are
+- Web Dev Quiz  10 real questions about javascript and web stuff, no joke questions
+
+---
+**now it have 18 games**
+
+
+## how i built it 
+
+| thing i used | why i used it |
+|---|---|
+| HTML5 + CSS3 | base struture and those 3D card flip animatons |
+| Tailwind CSS | fast styling without writting a million lines of css |
+| Vanilla JavaScript | all the game logic, timers, scoring  no frameworks needed |
+| Web Audio API | little sound effects and win noises (no extra files) |
+| CSS Animations | smooth transisions and that arcadey pop feeling |
 
 ---
 
-### AI usage 
- I used AI's help for finding how to do this stuff
- - so i wanted to make a data base but the normal lame one with sql was easier to make but harder to publish in another source so i used firebase and firestore.
- - I used AI to find how to auth with firebase and how to save the progress.
- - And I also used it to know how to check about the leaderboard but I cant figure it out much so it's still kinda messy (Don't worrry i will fix in near future)
- - I wanted a great theme and I used ai to scrape the web for some good UI's I found this on a site and made this project by myself ( I didnt copy the code i took a screen shot of it and coded myself and you know I've looked at some source code too)
- - So overall i used AI to find stuff but i didnt directly copy it and paste it i made them myself in here
+## ai usage (being honest here)
 
- ---
+look i used ai to *figure stuff out* not to write my code for me.:
 
-## Special notice for Hack club reviewers 
-
-- So i made this project by myself in vs code and live server i didnt know that i need to make commits as far as i can the first 18 hours of this project is not shown in commits because i made the commits after fully completing the project.
-
-- From the version 1.2 there will be commits for every feature of this site.
+- i wanted a database but normal sql stuff was hard to deploy elsewhere so ai helped me find firebase + firestore as a better optin
+- used it to understand how auth works in firebase and how to actualy save progres to the cloud
+- tried to figure out the leaderboard logic too but tbh its still kinda messy (It's fixed with the new update)
 
 ---
 
-## Version 1.2 Update 
-- I updated the site with 4 more fun games that i think works better 
-new games are :
-     - Snake
-     - Hangman 
-     - Word scramble
-     - Number guess
-- And i made an update so it will be able for you guys to make a account and play so you can share your scores with your friends 
-- And a new appearence is given.
-- The theme button is happening to have a bug I will fix it on the update 1.3
-- The problems and bugs in the project was corrected now everything works fine working on the version 1.3 also.
-- There was so many errors in the index.html so i had to use the original formation of files i had to upload as the normal formation it was likely on.
+## note for hack club reviewrs
+
+so heree's the thing  the first like 18 hours of this project wasnt commited because i didnt know i had to do commits as i go. i only pushed everything after i finished the inital build. from v1.2 onward im doing proper commits for every feture tho so itll be much cleaner going forward
 
 ---
 
-## Version 1.3 update 
-- Guess what I updated the site again and now these features work much better than the last time.
-  
-  1. Leaderboard logics are resetted
-  2. Ability to send me bug reports and new game suggestions are added 
-  3. And a small page about me is added there umm dont worry its just a normal update hehe.
-  4. The database authentication logic was also recreated since it had much time 
-  5. And I lost my sense of UI designing and now it should look like crap I think you guys wont blame abt it much.
-  6. So since you guys can reach me from the site tell me what to add and what to update in the site.
+## version history
 
-And this was the buggiest update I had ever did to this project. Since it was like when i created a new element and fixed something else just broke.So I hope you guys enjoy the site.
+### v1.2
+- added 4 new games: Snake, Hangman, Word Scramble, Number Guess
+- added acounts so you can actualy log in and share scores with freinds
+- gave the whole site a fresh new apperance
+- heads up: the theme toggle button has a bug, fixing in 1.3
+- also fixed a bunch of other bugs from v1 that were anoying me
 
+### v1.3
+- reset the leaderboard logic from scartch (it was a mess before)
+- added a bug report form and a game sugestion form so you can reach me directly
+- added a litle about me page (dont judge me lol)
+- completely redid the database auth because the old one was breaking
+- fair warning: the UI looks kinda bad this update. i lost my design inspration midway thru and just pushed it anyway. sorry
+- this was genuinly the buggiest update ive ever done. every time i fixed one thing somthing else exploded
+
+### v1.4
+- the site was literaly broken after v1.3 because of a bad commit that got synced by accident. had to re-add the files manually
+- changed the UI again because everyone hateed the neon theme apparently
+- went from 8 games to **18 games**  added a bunch of smaller ones i made for fun and cleaned them up
+- leaderboard is actualy working corectly now (finally)
+- fixed the auth issue that came with the bad sync
+- most bugs are squashed now, enjoy the site :)
 
 ---
 
-## Version 1.4 update 
--The site was basically broken last time since i made a wrong commitment in between the updates and it was synced accidently. And the new files weren't added there but the time was recorded so i added the files without recording time again.
+## screenshots
 
-  1. The UI is changed because everyone haates the neone theme.
-  2. There was some games made by me for fun I maded some little changes on it and added them here so now there are 18 games.
-  3. Leaderboard is functioning correctly now my auth was also wrong with the last sync.
-  4. All the bugs are fixed.
-
-Enjoy the site guys 
-
----
-
-### Some screenshots
-
-<img width="1920" height="939" alt="image" src="screenshot.png">
-<img width="1920" height="939" alt="image" src="screenshot2.png">
+![screenshot](screenshot.png)
+![screenshot2](screenshot2.png)
